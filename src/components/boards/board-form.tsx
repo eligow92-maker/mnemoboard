@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { ApiClientError, errorMessage } from "@/lib/api-client";
@@ -14,6 +14,7 @@ interface BoardFormProps {
 }
 
 export function BoardForm({ initialName = "", submitLabel, onSubmit, onCancel }: BoardFormProps) {
+  const fieldId = useId();
   const [name, setName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -40,7 +41,7 @@ export function BoardForm({ initialName = "", submitLabel, onSubmit, onCancel }:
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
       <TextField
-        id="board-name"
+        id={fieldId}
         label="Nazwa planszy"
         value={name}
         maxLength={BOARD_NAME_MAX_LENGTH}

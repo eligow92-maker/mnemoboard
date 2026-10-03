@@ -36,6 +36,19 @@ export function BoardListScreen() {
     router.push(`/boards/${board.id}`);
   }
 
+  async function renameBoard(boardId: string, name: string): Promise<void> {
+    const renamed = await api<BoardDto>(`/api/boards/${boardId}`, "PATCH", { name });
+    setBoards(
+      (current) =>
+        current?.map((board) => (board.id === boardId ? { ...board, ...renamed } : board)) ?? null,
+    );
+  }
+
+  async function deleteBoard(boardId: string): Promise<void> {
+    await api<void>(`/api/boards/${boardId}`, "DELETE");
+    setBoards((current) => current?.filter((board) => board.id !== boardId) ?? null);
+  }
+
   return (
     <main className="mx-auto flex w-full max-w-[960px] flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -87,7 +100,12 @@ export function BoardListScreen() {
       {boards !== null && boards.length > 0 && (
         <ul className="grid gap-3 sm:grid-cols-2">
           {boards.map((board) => (
-            <BoardCard key={board.id} board={board} />
+            <BoardCard
+              key={board.id}
+              board={board}
+              onRename={(name) => renameBoard(board.id, name)}
+              onDelete={() => deleteBoard(board.id)}
+            />
           ))}
         </ul>
       )}

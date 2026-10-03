@@ -494,7 +494,7 @@ AC-3: Given plansza bez żadnej ukończonej powtórki, when otwieram listę plan
 ---
 
 ### TASK-020: US-002 — Zarządzanie planszami
-**Priority**: P1 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P1 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 `PATCH/DELETE /api/boards/{id}`; menu BoardCard, ConfirmDialog, kaskadowe usunięcie zawartości.
@@ -507,12 +507,12 @@ AC-2: Given plansza z karteczkami, when wybieram usunięcie, then aplikacja pyta
 AC-3: Given potwierdzone usunięcie planszy, when wracam do listy, then plansza oraz jej karteczki, połączenia, strefy i wyniki powtórek nie istnieją.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-019
 **Blocks**: None

@@ -86,3 +86,14 @@ export async function getBoardDetail(boardId: string): Promise<BoardDetail> {
     notes: board.notes.map((note) => toNoteView(note, positions.get(note.id) ?? null)),
   };
 }
+
+export async function renameBoard(boardId: string, input: BoardInput): Promise<Board> {
+  await requireBoard(boardId);
+  return prisma.board.update({ where: { id: boardId }, data: { name: input.name } });
+}
+
+// Karteczki, połączenia, strefy, sesje i wyniki powtórek usuwa baza (ON DELETE CASCADE).
+export async function deleteBoard(boardId: string): Promise<void> {
+  await requireBoard(boardId);
+  await prisma.board.delete({ where: { id: boardId } });
+}
