@@ -95,7 +95,7 @@ AC-2: Given karteczka na planszy, when kończę jej przeciąganie, then BoardCan
 ---
 
 ### TASK-005: US-001 — Utworzenie pierwszej planszy
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 `GET/POST /api/boards`, strona listy plansz z pustym stanem, formularz nowej planszy, przekierowanie do pustej planszy.
@@ -108,12 +108,12 @@ AC-2: Given lista plansz, when tworzę planszę o nazwie "Historia Polski", then
 AC-3: Given formularz nowej planszy, when zatwierdzam pustą nazwę, then plansza nie powstaje i widzę komunikat "Podaj nazwę planszy".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-003
 **Blocks**: TASK-006
