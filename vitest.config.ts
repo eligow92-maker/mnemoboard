@@ -7,6 +7,8 @@ export default defineConfig({
   resolve: {
     alias: { "@": path.resolve(__dirname, "src") },
   },
+  // Konfiguracja PostCSS jest w formacie Next.js; testy nie potrzebują przetwarzania CSS.
+  css: { postcss: { plugins: [] } },
   test: {
     include: ["tests/unit/**/*.test.{ts,tsx}", "tests/integration/**/*.test.{ts,tsx}"],
     environment: "node",

@@ -74,7 +74,7 @@ AC-3: Given żądanie POST z nagłówkiem Origin innej witryny, when trafia do A
 ---
 
 ### TASK-004: Prototyp planszy (React Flow, dotyk)
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Największe ryzyko techniczne jako pierwsze (ADR-004): komponent `BoardCanvas` z własnym węzłem `NoteNode`, pan/zoom, przeciąganie myszą i dotykiem; ręczne sprawdzenie na telefonie konfiguracji `panOnDrag`/`nodesDraggable` i zapis wniosków w handoverze.
@@ -84,10 +84,10 @@ AC-1: Given plansza z jedną karteczką, when renderuję BoardCanvas, then widz�
 AC-2: Given karteczka na planszy, when kończę jej przeciąganie, then BoardCanvas wywołuje `onNoteMove` z identyfikatorem karteczki i nowym położeniem.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: TASK-001
 **Blocks**: TASK-006
