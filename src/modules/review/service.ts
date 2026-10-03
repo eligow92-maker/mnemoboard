@@ -1,6 +1,7 @@
 import { Prisma, type ReviewResult, type ReviewSession } from "@prisma/client";
 import { ApiError, notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
+import { reviewOrder } from "./order";
 import type { ReviewResultInput } from "./schema";
 import { percent } from "./score";
 
@@ -30,15 +31,35 @@ function sessionFinished(): ApiError {
   return new ApiError(409, "SESSION_FINISHED", "Ta powtórka jest już zakończona");
 }
 
-// Kolejność kart jest zwracana przy starcie i trzymana przez klienta; serwer zapisuje tylko wyniki.
+// Karty powtórki: tylko karteczki ze słowami-obrazami, najpierw łańcuchy po kolei, potem reszta
+// według daty utworzenia. Kolejność trzyma klient; serwer zapisuje tylko wyniki.
 export async function startSession(boardId: string): Promise<ReviewSessionStart> {
-  const notes = await prisma.note.findMany({ where: { boardId }, orderBy: { createdAt: "asc" } });
-  const cards = notes.map((note) => ({
-    noteId: note.id,
-    topic: note.topic,
-    imageWords: note.imageWords ?? "",
-    zoneName: null,
-  }));
+  const [notes, chainLinks] = await Promise.all([
+    prisma.note.findMany({ where: { boardId }, include: { zone: { select: { name: true } } } }),
+    prisma.connection.findMany({
+      where: { boardId, kind: "chain" },
+      orderBy: { createdAt: "asc" },
+    }),
+  ]);
+  const reviewable = new Map(
+    notes.filter((note) => (note.imageWords ?? "").trim() !== "").map((note) => [note.id, note]),
+  );
+  if (reviewable.size === 0) {
+    throw new ApiError(422, "NO_REVIEWABLE_NOTES", "Dodaj słowa-obrazy, aby rozpocząć powtórkę");
+  }
+
+  const cards = reviewOrder([...reviewable.values()], chainLinks).flatMap((noteId) => {
+    const note = reviewable.get(noteId);
+    if (!note) return [];
+    return [
+      {
+        noteId: note.id,
+        topic: note.topic,
+        imageWords: note.imageWords ?? "",
+        zoneName: note.zone?.name ?? null,
+      },
+    ];
+  });
 
   const session = await prisma.reviewSession.create({ data: { boardId } });
   return { id: session.id, boardId, startedAt: session.startedAt, cards };

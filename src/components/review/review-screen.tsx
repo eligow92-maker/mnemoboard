@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { api, errorMessage } from "@/lib/api-client";
+import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { ReviewCardDto, ReviewSessionStartDto, ReviewSummaryDto } from "@/lib/api-types";
 
 const LINK_BUTTON_CLASS =
@@ -15,11 +15,24 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
       aria-label="Karteczka"
       className="flex min-h-48 flex-col gap-4 rounded-lg border border-note-border bg-note p-4 shadow-note"
     >
-      <p className="text-[1.75rem] leading-tight font-bold break-words whitespace-pre-wrap">
+      <p
+        data-testid="review-topic"
+        className="text-[1.75rem] leading-tight font-bold break-words whitespace-pre-wrap"
+      >
         {card.topic}
       </p>
       {revealed ? (
-        <p className="text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
+          {card.zoneName !== null && (
+            <span
+              aria-label={`Pokój: ${card.zoneName}`}
+              className="max-w-full truncate rounded-full bg-secondary px-3 py-1 text-sm font-medium text-white"
+            >
+              {card.zoneName}
+            </span>
+          )}
+        </div>
       ) : (
         <p className="text-text-secondary">Słowa-obrazy są zakryte.</p>
       )}
@@ -49,6 +62,23 @@ function ReviewSummary({ summary, boardId }: { summary: ReviewSummaryDto; boardI
   );
 }
 
+function ReviewUnavailable({ boardId }: { boardId: string }) {
+  return (
+    <section
+      aria-label="Powtórka niedostępna"
+      className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-surface p-6 text-center"
+    >
+      <p className="text-lg font-medium">Dodaj słowa-obrazy, aby rozpocząć powtórkę</p>
+      <p className="text-text-secondary">
+        W powtórce biorą udział tylko karteczki, które mają słowa-obrazy.
+      </p>
+      <Link href={`/boards/${boardId}`} className={LINK_BUTTON_CLASS}>
+        Wróć do planszy
+      </Link>
+    </section>
+  );
+}
+
 // Powtórka: zagadnienie → "Odsłoń" → samoocena → następna karta → podsumowanie.
 export function ReviewScreen({ boardId }: { boardId: string }) {
   const [session, setSession] = useState<ReviewSessionStartDto | null>(null);
@@ -56,6 +86,7 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
   const [revealed, setRevealed] = useState(false);
   const [summary, setSummary] = useState<ReviewSummaryDto | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
   const [saving, setSaving] = useState(false);
   // Sesję zakładamy raz — także wtedy, gdy React w trybie dev uruchamia efekt dwukrotnie.
   const started = useRef(false);
@@ -65,7 +96,13 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
     started.current = true;
     api<ReviewSessionStartDto>(`/api/boards/${boardId}/review-sessions`, "POST")
       .then(setSession)
-      .catch((caught: unknown) => setError(errorMessage(caught)));
+      .catch((caught: unknown) => {
+        if (caught instanceof ApiClientError && caught.code === "NO_REVIEWABLE_NOTES") {
+          setUnavailable(true);
+        } else {
+          setError(errorMessage(caught));
+        }
+      });
   }, [boardId]);
 
   async function answer(remembered: boolean): Promise<void> {
@@ -110,7 +147,8 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
           {error}
         </p>
       )}
-      {!session && !error && <p className="text-text-secondary">Wczytywanie…</p>}
+      {!session && !error && !unavailable && <p className="text-text-secondary">Wczytywanie…</p>}
+      {unavailable && <ReviewUnavailable boardId={boardId} />}
 
       {summary && <ReviewSummary summary={summary} boardId={boardId} />}
 
@@ -143,7 +181,7 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
         </>
       )}
 
-      {!summary && (
+      {!summary && !unavailable && (
         <Link href={`/boards/${boardId}`} className="self-start py-2 text-primary underline">
           Wróć do planszy
         </Link>
