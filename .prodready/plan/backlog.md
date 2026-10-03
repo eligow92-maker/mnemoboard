@@ -257,7 +257,7 @@ AC-4: Given karteczka mająca już słowa-obrazy, when używam akcji "Generuj s�
 ---
 
 ### TASK-011: US-005 — Ręczne słowa-obrazy
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Pole słów-obrazów w NoteEditor i na karteczce; obsługa odpowiedzi `NO_DIGITS` z komunikatem.
@@ -269,10 +269,10 @@ AC-1: Given karteczka z zagadnieniem "Mitochondrium", when wpisuję słowa-obraz
 AC-2: Given karteczka z zagadnieniem bez cyfr, when używam akcji "Generuj słowa", then słowa nie są generowane i widzę komunikat "Brak liczb – wpisz słowa-obrazy samodzielnie".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: TASK-010
 **Blocks**: TASK-017

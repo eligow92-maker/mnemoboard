@@ -22,12 +22,15 @@ interface NoteEditorProps {
   onDelete?: () => Promise<void>;
 }
 
+export const NO_DIGITS_MESSAGE = "Brak liczb – wpisz słowa-obrazy samodzielnie";
+
 // Panel boczny na komputerze, arkusz dolny na telefonie.
 export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
   const [imageWords, setImageWords] = useState(initial.imageWords);
   // Wygenerowane słowa czekające na potwierdzenie zastąpienia dotychczasowych.
   const [pendingWords, setPendingWords] = useState<string | null>(null);
+  const [wordsHint, setWordsHint] = useState<string | null>(null);
   const [topicError, setTopicError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -59,6 +62,7 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
       return;
     }
     setFormError(null);
+    setWordsHint(null);
     try {
       const generated = await api<GeneratedWordImagesDto>("/api/word-images/generate", "POST", {
         topic,
@@ -66,7 +70,11 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
       if (imageWords.trim() === "") setImageWords(generated.imageWords);
       else if (generated.imageWords !== imageWords.trim()) setPendingWords(generated.imageWords);
     } catch (caught) {
-      setFormError(errorMessage(caught));
+      if (caught instanceof ApiClientError && caught.code === "NO_DIGITS") {
+        setWordsHint(NO_DIGITS_MESSAGE);
+      } else {
+        setFormError(errorMessage(caught));
+      }
     }
   }
 
@@ -105,6 +113,11 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           maxLength={NOTE_TEXT_MAX_LENGTH}
           onChange={(event) => setImageWords(event.target.value)}
         />
+        {wordsHint && (
+          <p role="status" className="text-sm text-warning">
+            {wordsHint}
+          </p>
+        )}
         <Button variant="secondary" className="self-start" onClick={handleGenerate}>
           Generuj słowa
         </Button>

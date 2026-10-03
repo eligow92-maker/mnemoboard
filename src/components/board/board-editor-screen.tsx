@@ -93,6 +93,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
   async function createNote(position: Position, values: NoteEditorValues): Promise<void> {
     const note = await api<NoteDto>(`/api/boards/${boardId}/notes`, "POST", {
       topic: values.topic,
+      imageWords: values.imageWords || null,
       ...position,
     });
     setBoard((current) => current && { ...current, notes: [...current.notes, note] });
@@ -100,7 +101,12 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
   }
 
   async function saveNote(noteId: string, values: NoteEditorValues): Promise<void> {
-    replaceNote(await api<NoteDto>(`/api/notes/${noteId}`, "PATCH", { topic: values.topic }));
+    replaceNote(
+      await api<NoteDto>(`/api/notes/${noteId}`, "PATCH", {
+        topic: values.topic,
+        imageWords: values.imageWords || null,
+      }),
+    );
     setPanel(null);
   }
 
