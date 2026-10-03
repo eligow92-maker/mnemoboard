@@ -113,3 +113,13 @@ export async function finishSession(sessionId: string): Promise<ReviewSummary> {
     percent: percent(rememberedCount, totalCount),
   };
 }
+
+const STATS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Regularność: liczba ukończonych powtórek z ostatnich 7 dni (wszystkie plansze).
+export async function getStats(): Promise<{ sessionsLast7Days: number }> {
+  const sessionsLast7Days = await prisma.reviewSession.count({
+    where: { finishedAt: { gte: new Date(Date.now() - STATS_WINDOW_MS) } },
+  });
+  return { sessionsLast7Days };
+}

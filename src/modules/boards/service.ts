@@ -3,23 +3,52 @@ import { notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { chainPositions } from "@/modules/arrangement/chain";
 import { toNoteView, type NoteView } from "@/modules/notes/service";
+import { percent } from "@/modules/review/score";
 import type { BoardInput } from "./schema";
+
+export interface LastReview {
+  finishedAt: Date;
+  rememberedCount: number;
+  totalCount: number;
+  percent: number;
+}
 
 export interface BoardSummary extends Board {
   noteCount: number;
-  lastReview: null;
+  // null, gdy plansza nie ma ukończonej powtórki.
+  lastReview: LastReview | null;
 }
 
+// Lista plansz z liczbą karteczek i wynikiem ostatniej ukończonej powtórki — stała liczba zapytań.
 export async function listBoards(): Promise<BoardSummary[]> {
   const boards = await prisma.board.findMany({
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { notes: true } } },
+    include: {
+      _count: { select: { notes: true } },
+      reviewSessions: {
+        where: { finishedAt: { not: null }, results: { some: {} } },
+        orderBy: { finishedAt: "desc" },
+        take: 1,
+        include: { results: { select: { remembered: true } } },
+      },
+    },
   });
-  return boards.map(({ _count, ...board }) => ({
-    ...board,
-    noteCount: _count.notes,
-    lastReview: null,
-  }));
+
+  return boards.map(({ _count, reviewSessions, ...board }) => {
+    const [session] = reviewSessions;
+    let lastReview: LastReview | null = null;
+    if (session?.finishedAt) {
+      const totalCount = session.results.length;
+      const rememberedCount = session.results.filter((result) => result.remembered).length;
+      lastReview = {
+        finishedAt: session.finishedAt,
+        rememberedCount,
+        totalCount,
+        percent: percent(rememberedCount, totalCount),
+      };
+    }
+    return { ...board, noteCount: _count.notes, lastReview };
+  });
 }
 
 export async function createBoard(input: BoardInput): Promise<Board> {

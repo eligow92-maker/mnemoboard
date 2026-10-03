@@ -95,3 +95,7 @@ export interface ReviewSummaryDto {
   totalCount: number;
   percent: number;
 }
+
+export interface StatsDto {
+  sessionsLast7Days: number;
+}

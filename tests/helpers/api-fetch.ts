@@ -32,6 +32,7 @@ const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
     "/api/review-sessions/[sessionId]/finish",
     () => import("@/app/api/review-sessions/[sessionId]/finish/route"),
   ],
+  ["/api/stats", () => import("@/app/api/stats/route")],
   ["/api/word-images/generate", () => import("@/app/api/word-images/generate/route")],
   ["/api/peg-words", () => import("@/app/api/peg-words/route")],
   ["/api/peg-words/[number]", () => import("@/app/api/peg-words/[number]/route")],

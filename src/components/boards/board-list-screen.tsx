@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { api, errorMessage } from "@/lib/api-client";
-import type { BoardDto, BoardSummaryDto } from "@/lib/api-types";
+import type { BoardDto, BoardSummaryDto, StatsDto } from "@/lib/api-types";
 import { BoardCard } from "./board-card";
 import { BoardForm } from "./board-form";
 
 export function BoardListScreen() {
   const router = useRouter();
   const [boards, setBoards] = useState<BoardSummaryDto[] | null>(null);
+  const [stats, setStats] = useState<StatsDto | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -19,6 +20,10 @@ export function BoardListScreen() {
     api<BoardSummaryDto[]>("/api/boards")
       .then((loaded) => active && setBoards(loaded))
       .catch((error: unknown) => active && setLoadError(errorMessage(error)));
+    // Statystyki są dodatkiem — ich brak nie blokuje listy plansz.
+    api<StatsDto>("/api/stats")
+      .then((loaded) => active && setStats(loaded))
+      .catch(() => undefined);
     return () => {
       active = false;
     };
@@ -39,6 +44,15 @@ export function BoardListScreen() {
           <Button onClick={() => setCreating(true)}>Nowa plansza</Button>
         )}
       </div>
+
+      {stats && (
+        <p
+          aria-label="Statystyki"
+          className="rounded-lg border border-border bg-surface px-4 py-3 font-medium"
+        >
+          {`Powtórki w ostatnich 7 dniach: ${stats.sessionsLast7Days}`}
+        </p>
+      )}
 
       {loadError && (
         <p role="alert" className="text-error">

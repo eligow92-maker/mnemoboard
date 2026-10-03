@@ -468,7 +468,7 @@ AC-4: Given karteczka w powtórce przypisana do pokoju "Kuchnia", when wybieram 
 ---
 
 ### TASK-019: US-013 — Statystyki zapamiętywania
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 `lastReview` i `noteCount` w `GET /api/boards`, `GET /api/stats`; BoardCard z wynikiem i datą, StatsPanel.
@@ -481,12 +481,12 @@ AC-2: Given 3 ukończone powtórki w ciągu ostatnich 7 dni, when otwieram staty
 AC-3: Given plansza bez żadnej ukończonej powtórki, when otwieram listę plansz, then przy planszy widzę "Brak powtórek".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-017
 **Blocks**: TASK-020
