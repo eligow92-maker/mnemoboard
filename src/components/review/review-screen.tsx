@@ -22,12 +22,12 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
         {card.topic}
       </p>
       {revealed ? (
-        <div className="flex flex-col items-start gap-2">
-          <p className="text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
+        <div className="flex min-w-0 flex-col items-start gap-2">
+          <p className="max-w-full text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
           {card.zoneName !== null && (
             <span
               aria-label={`Pokój: ${card.zoneName}`}
-              className="max-w-full truncate rounded-full bg-secondary px-3 py-1 text-sm font-medium text-white"
+              className="max-w-full rounded-lg bg-secondary px-3 py-1 text-sm font-medium break-words text-white"
             >
               {card.zoneName}
             </span>

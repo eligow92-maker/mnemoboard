@@ -520,7 +520,7 @@ AC-3: Given potwierdzone usunięcie planszy, when wracam do listy, then plansza 
 ---
 
 ### TASK-021: US-014 — Praca na telefonie
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 Układ responsywny od 375 px (pasek narzędzi na dole, NoteEditor jako arkusz dolny, powtórka w jednej kolumnie), cele dotykowe 44 px, testy Playwright w profilu mobilnym z dotykiem.
@@ -533,12 +533,12 @@ AC-2: Given plansza otwarta na urządzeniu dotykowym, when przeciągam karteczk�
 AC-3: Given karteczka dodana na jednym urządzeniu, when otwieram tę planszę na drugim urządzeniu, then widzę tę karteczkę.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-018, TASK-015
 **Blocks**: None

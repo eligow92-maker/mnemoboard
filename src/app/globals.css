@@ -31,3 +31,11 @@
   --shadow-note: 0 2px 4px rgb(42 38 34 / 0.18);
   --shadow-note-drag: 0 8px 16px rgb(42 38 34 / 0.25);
 }
+
+/* Przyciski powiększania planszy jako cele dotykowe 44 px (touch-target-min). */
+.react-flow .react-flow__controls .react-flow__controls-button {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
+}

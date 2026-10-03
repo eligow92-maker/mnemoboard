@@ -10,7 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background text-text-primary">
       <header className="flex items-center justify-between gap-4 border-b border-border bg-surface px-4 py-2">
-        <Link href="/" className="text-lg font-bold text-primary">
+        <Link href="/" className="flex min-h-11 items-center text-lg font-bold text-primary">
           Mnemoboard
         </Link>
         <nav aria-label="Główna nawigacja" className="flex gap-1">

@@ -27,13 +27,16 @@ function modeHint(mode: EditorMode): string {
   }
 }
 
-// Pasek narzędzi: na telefonie przyklejony do dołu ekranu, od md nad planszą.
+// Pasek narzędzi: na telefonie na dole ekranu jako siatka 2×2 (wszystkie akcje widoczne bez
+// przewijania), od md w jednym wierszu nad planszą.
 export function BoardToolbar({ mode, onModeChange }: BoardToolbarProps) {
   return (
     <div
       role="toolbar"
       aria-label="Narzędzia planszy"
-      className="order-last flex flex-wrap items-center gap-2 border-t border-border bg-surface px-4 py-2 md:order-none md:border-t-0 md:border-b"
+      className={`order-last items-center gap-2 border-t border-border bg-surface px-4 py-2 md:order-none md:flex md:flex-wrap md:border-t-0 md:border-b ${
+        mode.kind === "idle" ? "grid grid-cols-2" : "flex flex-wrap justify-between"
+      }`}
     >
       {mode.kind === "idle" ? (
         <>
