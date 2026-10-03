@@ -546,7 +546,7 @@ AC-3: Given karteczka dodana na jednym urządzeniu, when otwieram tę planszę n
 ---
 
 ### TASK-022: Utwardzenie bezpieczeństwa
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Nagłówki bezpieczeństwa w `next.config` (CSP, X-Content-Type-Options, Referrer-Policy), przegląd renderowania treści użytkownika, limity długości pól.
@@ -556,10 +556,10 @@ AC-1: Given dowolna odpowiedź aplikacji, when sprawdzam nagłówki, then zawier
 AC-2: Given karteczka z zagadnieniem `<script>alert(1)</script>`, when plansza ją renderuje, then zagadnienie jest widoczne jako tekst i nie powstaje element script.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: TASK-006
 **Blocks**: None

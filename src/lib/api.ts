@@ -42,6 +42,8 @@ interface RouteContext {
 }
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+// Największe poprawne żądanie (karteczka: dwa pola po 500 znaków) jest wielokrotnie mniejsze.
+const MAX_BODY_LENGTH = 16_384;
 
 function errorResponse(error: ApiError): Response {
   return Response.json(
@@ -72,9 +74,14 @@ async function parseBody<TSchema extends z.ZodTypeAny>(
     throw new ApiError(400, "VALIDATION_ERROR", "Treść żądania musi być w formacie JSON");
   }
 
+  const text = await request.text();
+  if (text.length > MAX_BODY_LENGTH) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Treść żądania jest zbyt duża");
+  }
+
   let json: unknown;
   try {
-    json = await request.json();
+    json = JSON.parse(text);
   } catch {
     throw new ApiError(400, "VALIDATION_ERROR", "Niepoprawny JSON w treści żądania");
   }
