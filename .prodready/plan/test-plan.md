@@ -191,10 +191,10 @@ Testy uruchamiane przy każdym pushu i PR:
 | TASK-014 | AC-1 | tests/unit/zones.test.ts | AC-1: Given strefa i karteczka, której środek leży wewnątrz strefy, when wyznaczam strefę karteczki, then wynikiem jest identyfikator tej strefy. | Yes |
 | TASK-014 | AC-2 | tests/unit/zones.test.ts | AC-2: Given dwie nakładające się strefy i karteczka w części wspólnej, when wyznaczam strefę karteczki, then wynikiem jest strefa utworzona później. | Yes |
 | TASK-014 | AC-3 | tests/unit/zones.test.ts | AC-3: Given karteczka przypisana do strefy, when przeliczam przypisania po przesunięciu strefy poza karteczkę, then karteczka nie ma przypisanej strefy. | Yes |
-| US-010 / TASK-015 | AC-1 | tests/integration/us-010-zones.test.tsx | AC-1: Given otwarta plansza, when tworzę strefę o nazwie "Kuchnia", then strefa z tą nazwą jest widoczna na planszy. | Pending |
-| US-010 / TASK-015 | AC-2 | tests/integration/us-010-zones.test.tsx | AC-2: Given strefa "Kuchnia", when upuszczam karteczkę w jej obrębie, then karteczka jest przypisana do pokoju "Kuchnia". | Pending |
-| US-010 / TASK-015 | AC-3 | tests/integration/us-010-zones.test.tsx | AC-3: Given karteczka przypisana do pokoju "Kuchnia", when przeciągam ją poza strefę, then karteczka nie jest przypisana do żadnego pokoju. | Pending |
-| US-010 / TASK-015 | AC-4 | tests/integration/us-010-zones.test.tsx | AC-4: Given strefa zawierająca karteczki, when usuwam strefę, then karteczki pozostają na planszy bez przypisanego pokoju. | Pending |
+| US-010 / TASK-015 | AC-1 | tests/integration/us-010-zones.test.tsx | AC-1: Given otwarta plansza, when tworzę strefę o nazwie "Kuchnia", then strefa z tą nazwą jest widoczna na planszy. | Yes |
+| US-010 / TASK-015 | AC-2 | tests/integration/us-010-zones.test.tsx | AC-2: Given strefa "Kuchnia", when upuszczam karteczkę w jej obrębie, then karteczka jest przypisana do pokoju "Kuchnia". | Yes |
+| US-010 / TASK-015 | AC-3 | tests/integration/us-010-zones.test.tsx | AC-3: Given karteczka przypisana do pokoju "Kuchnia", when przeciągam ją poza strefę, then karteczka nie jest przypisana do żadnego pokoju. | Yes |
+| US-010 / TASK-015 | AC-4 | tests/integration/us-010-zones.test.tsx | AC-4: Given strefa zawierająca karteczki, when usuwam strefę, then karteczki pozostają na planszy bez przypisanego pokoju. | Yes |
 | TASK-016 | AC-1 | tests/unit/review-order.test.ts | AC-1: Given plansza z łańcuchem B→C i luźną karteczką A utworzoną najwcześniej, when wyznaczam kolejność powtórki, then kolejność to B, C, A. | Pending |
 | TASK-016 | AC-2 | tests/unit/review-order.test.ts | AC-2: Given plansza z luźnymi karteczkami utworzonymi w kolejności A, B, C, when wyznaczam kolejność powtórki, then kolejność to A, B, C. | Pending |
 | US-011 / TASK-017 | AC-1 | tests/integration/us-011-review.test.tsx | AC-1: Given plansza z karteczkami mającymi słowa-obrazy, when rozpoczynam powtórkę, then widzę zagadnienie pierwszej karteczki, a jej słowa-obrazy są zakryte. | Pending |

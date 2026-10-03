@@ -18,12 +18,14 @@ import type { ConnectionKind } from "@/lib/api-types";
 import { ConnectionEdge, type ConnectionFlowEdge } from "./connection-edge";
 import type { Position } from "./dimensions";
 import { NoteNode, type NoteFlowNode } from "./note-node";
+import { ZONE_DRAG_HANDLE_CLASS, ZoneNode, type ZoneFlowNode, type ZoneRect } from "./zone-node";
 
 export interface CanvasNote {
   id: string;
   topic: string;
   imageWords: string | null;
   chainPosition?: number | null;
+  zoneId?: string | null;
   x: number;
   y: number;
 }
@@ -35,11 +37,20 @@ export interface CanvasConnection {
   kind: ConnectionKind;
 }
 
+export interface CanvasZone extends ZoneRect {
+  id: string;
+  name: string;
+}
+
 export interface BoardCanvasProps {
   notes: CanvasNote[];
+  zones?: CanvasZone[];
   connections?: CanvasConnection[];
   onNoteMove: (noteId: string, position: Position) => void;
   onNoteClick?: (noteId: string) => void;
+  // Strefa przesunięta lub przeskalowana — wywoływane raz, po zakończeniu gestu.
+  onZoneChange?: (zoneId: string, rect: ZoneRect) => void;
+  onZoneClick?: (zoneId: string) => void;
   onConnectionClick?: (connectionId: string) => void;
   // Kliknięcie tła planszy; położenie w układzie planszy (nie ekranu).
   onPaneClick?: (position: Position) => void;
@@ -50,21 +61,46 @@ export interface BoardCanvasProps {
   selectedConnectionId?: string | null;
 }
 
-const NODE_TYPES = { note: NoteNode };
+type BoardFlowNode = NoteFlowNode | ZoneFlowNode;
+
+const NODE_TYPES = { note: NoteNode, zone: ZoneNode };
 const EDGE_TYPES = { connection: ConnectionEdge };
 const NO_CONNECTIONS: CanvasConnection[] = [];
+const NO_ZONES: CanvasZone[] = [];
 
-function toNode(note: CanvasNote, highlightedNoteId: string | null): NoteFlowNode {
+function toNoteNode(
+  note: CanvasNote,
+  zoneNames: Map<string, string>,
+  highlightedNoteId: string | null,
+): NoteFlowNode {
   return {
     id: note.id,
     type: "note",
     position: { x: note.x, y: note.y },
+    zIndex: 1,
     data: {
       topic: note.topic,
       imageWords: note.imageWords,
       chainPosition: note.chainPosition ?? null,
+      zoneName: (note.zoneId && zoneNames.get(note.zoneId)) || null,
       highlighted: note.id === highlightedNoteId,
     },
+  };
+}
+
+function toZoneNode(zone: CanvasZone, onResizeEnd: (rect: ZoneRect) => void): ZoneFlowNode {
+  return {
+    id: zone.id,
+    type: "zone",
+    position: { x: zone.x, y: zone.y },
+    width: zone.width,
+    height: zone.height,
+    // Pod karteczkami; powierzchnia strefy nie przechwytuje dotyku (przesuwanie widoku,
+    // wskazywanie miejsca karteczki), aktywna jest tylko etykieta i uchwyty rozmiaru.
+    zIndex: 0,
+    dragHandle: `.${ZONE_DRAG_HANDLE_CLASS}`,
+    style: { pointerEvents: "none" },
+    data: { name: zone.name, onResizeEnd },
   };
 }
 
@@ -75,6 +111,7 @@ function toEdge(connection: CanvasConnection, selectedId: string | null): Connec
     source: connection.sourceNoteId,
     target: connection.targetNoteId,
     selected: connection.id === selectedId,
+    zIndex: 1,
     data: { kind: connection.kind },
     markerEnd:
       connection.kind === "chain"
@@ -85,9 +122,12 @@ function toEdge(connection: CanvasConnection, selectedId: string | null): Connec
 
 function Canvas({
   notes,
+  zones = NO_ZONES,
   connections = NO_CONNECTIONS,
   onNoteMove,
   onNoteClick,
+  onZoneChange,
+  onZoneClick,
   onConnectionClick,
   onPaneClick,
   placing = false,
@@ -95,20 +135,20 @@ function Canvas({
   selectedConnectionId = null,
 }: BoardCanvasProps) {
   const { screenToFlowPosition } = useReactFlow();
-  const [nodes, setNodes, onNodesChange] = useNodesState<NoteFlowNode>(
-    notes.map((note) => toNode(note, highlightedNoteId)),
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState<BoardFlowNode>([]);
 
-  // Serwer jest źródłem prawdy: każda zmiana listy karteczek nadpisuje lokalny stan węzłów.
+  // Serwer jest źródłem prawdy: każda zmiana danych planszy nadpisuje lokalny stan węzłów.
   useEffect(() => {
+    const zoneNames = new Map(zones.map((zone) => [zone.id, zone.name]));
     setNodes((current) => {
       const selected = new Set(current.filter((node) => node.selected).map((node) => node.id));
-      return notes.map((note) => ({
-        ...toNode(note, highlightedNoteId),
-        selected: selected.has(note.id),
-      }));
+      const next: BoardFlowNode[] = [
+        ...zones.map((zone) => toZoneNode(zone, (rect) => onZoneChange?.(zone.id, rect))),
+        ...notes.map((note) => toNoteNode(note, zoneNames, highlightedNoteId)),
+      ];
+      return next.map((node) => ({ ...node, selected: selected.has(node.id) }) as BoardFlowNode);
     });
-  }, [notes, highlightedNoteId, setNodes]);
+  }, [notes, zones, highlightedNoteId, onZoneChange, setNodes]);
 
   const edges = useMemo(
     () => connections.map((connection) => toEdge(connection, selectedConnectionId)),
@@ -116,16 +156,24 @@ function Canvas({
   );
 
   // Położenie zapisujemy raz, po upuszczeniu — nie przy każdym ruchu.
-  const handleNodeDragStop = useCallback<OnNodeDrag<NoteFlowNode>>(
+  const handleNodeDragStop = useCallback<OnNodeDrag<BoardFlowNode>>(
     (_event, node) => {
-      onNoteMove(node.id, { x: node.position.x, y: node.position.y });
+      const { x, y } = node.position;
+      if (node.type === "zone") {
+        onZoneChange?.(node.id, { x, y, width: node.width ?? 0, height: node.height ?? 0 });
+      } else {
+        onNoteMove(node.id, { x, y });
+      }
     },
-    [onNoteMove],
+    [onNoteMove, onZoneChange],
   );
 
-  const handleNodeClick = useCallback<NodeMouseHandler<NoteFlowNode>>(
-    (_event, node) => onNoteClick?.(node.id),
-    [onNoteClick],
+  const handleNodeClick = useCallback<NodeMouseHandler<BoardFlowNode>>(
+    (_event, node) => {
+      if (node.type === "zone") onZoneClick?.(node.id);
+      else onNoteClick?.(node.id);
+    },
+    [onNoteClick, onZoneClick],
   );
 
   const handleEdgeClick = useCallback<EdgeMouseHandler<ConnectionFlowEdge>>(
@@ -159,6 +207,8 @@ function Canvas({
       zoomOnPinch
       nodesConnectable={false}
       edgesFocusable={false}
+      // Zaznaczona strefa nie może wyjść nad karteczki.
+      elevateNodesOnSelect={false}
       minZoom={0.25}
       maxZoom={2}
       deleteKeyCode={null}

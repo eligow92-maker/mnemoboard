@@ -6,6 +6,7 @@ import { TextAreaField } from "@/components/ui/field";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { GeneratedWordImagesDto } from "@/lib/api-types";
+import { SidePanel } from "./side-panel";
 import { NOTE_TEXT_MAX_LENGTH, NOTE_TOPIC_REQUIRED_MESSAGE } from "@/modules/notes/schema";
 
 export interface NoteEditorValues {
@@ -24,7 +25,6 @@ interface NoteEditorProps {
 
 export const NO_DIGITS_MESSAGE = "Brak liczb – wpisz słowa-obrazy samodzielnie";
 
-// Panel boczny na komputerze, arkusz dolny na telefonie.
 export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
   const [imageWords, setImageWords] = useState(initial.imageWords);
@@ -91,10 +91,7 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
   }
 
   return (
-    <aside
-      aria-label={title}
-      className="fixed inset-x-0 bottom-0 z-20 max-h-[80dvh] overflow-y-auto rounded-t-lg border border-border bg-surface p-4 shadow-lg md:static md:max-h-none md:w-80 md:shrink-0 md:rounded-none md:border-y-0 md:border-r-0 md:shadow-none"
-    >
+    <SidePanel label={title}>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
         <h2 className="text-lg font-bold">{title}</h2>
         <TextAreaField
@@ -153,6 +150,6 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           Obecne słowa „{imageWords}” zostaną zastąpione przez „{pendingWords}”.
         </ConfirmDialog>
       )}
-    </aside>
+    </SidePanel>
   );
 }

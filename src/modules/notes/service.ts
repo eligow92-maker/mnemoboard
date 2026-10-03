@@ -2,6 +2,7 @@ import type { Note } from "@prisma/client";
 import { notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { boardChainPositions } from "@/modules/arrangement/connections";
+import { zoneIdForPosition } from "@/modules/arrangement/zone-service";
 import type { NoteCreateInput, NoteUpdateInput } from "./schema";
 
 // Karteczka w kształcie odpowiedzi API: z wyliczanym numerem w łańcuchu.
@@ -21,6 +22,7 @@ export async function createNote(boardId: string, input: NoteCreateInput): Promi
       imageWords: input.imageWords ?? null,
       x: input.x,
       y: input.y,
+      zoneId: await zoneIdForPosition(boardId, input.x, input.y),
     },
   });
   return toNoteView(note);
@@ -33,10 +35,20 @@ async function requireNote(noteId: string): Promise<Note> {
 }
 
 export async function updateNote(noteId: string, input: NoteUpdateInput): Promise<NoteView> {
-  await requireNote(noteId);
+  const current = await requireNote(noteId);
+  // Po zmianie położenia serwer wylicza pokój od nowa (środek karteczki wewnątrz strefy).
+  const moved = input.x !== undefined || input.y !== undefined;
+  const x = input.x ?? current.x;
+  const y = input.y ?? current.y;
   const note = await prisma.note.update({
     where: { id: noteId },
-    data: { topic: input.topic, imageWords: input.imageWords, x: input.x, y: input.y },
+    data: {
+      topic: input.topic,
+      imageWords: input.imageWords,
+      x,
+      y,
+      zoneId: moved ? await zoneIdForPosition(current.boardId, x, y) : undefined,
+    },
   });
   const positions = await boardChainPositions(note.boardId);
   return toNoteView(note, positions.get(note.id) ?? null);

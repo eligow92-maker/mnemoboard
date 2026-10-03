@@ -5,6 +5,8 @@ export interface NoteNodeData extends Record<string, unknown> {
   imageWords: string | null;
   // Numer kolejności w łańcuchu; null poza łańcuchem.
   chainPosition: number | null;
+  // Nazwa pokoju, do którego karteczka jest przypisana; null poza pokojami.
+  zoneName: string | null;
   // Karteczka wskazana jako początek tworzonego połączenia.
   highlighted: boolean;
 }
@@ -45,6 +47,14 @@ export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) 
         <p className="mt-1 break-words whitespace-pre-wrap text-text-secondary">
           {data.imageWords}
         </p>
+      )}
+      {data.zoneName !== null && (
+        <span
+          aria-label={`Pokój: ${data.zoneName}`}
+          className="mt-2 inline-block max-w-full truncate rounded-full bg-secondary px-2 py-0.5 align-bottom text-xs font-medium text-white"
+        >
+          {data.zoneName}
+        </span>
       )}
       <Handle
         type="source"
