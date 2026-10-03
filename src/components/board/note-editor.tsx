@@ -15,10 +15,12 @@ interface NoteEditorProps {
   initial: NoteEditorValues;
   onSave: (values: NoteEditorValues) => Promise<void>;
   onCancel: () => void;
+  // Tylko dla istniejącej karteczki.
+  onDelete?: () => Promise<void>;
 }
 
 // Panel boczny na komputerze, arkusz dolny na telefonie.
-export function NoteEditor({ title, initial, onSave, onCancel }: NoteEditorProps) {
+export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
   const [topicError, setTopicError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -41,6 +43,18 @@ export function NoteEditor({ title, initial, onSave, onCancel }: NoteEditorProps
       const fieldError = caught instanceof ApiClientError ? caught.fields.topic : undefined;
       if (fieldError) setTopicError(fieldError);
       else setFormError(errorMessage(caught));
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(): Promise<void> {
+    if (!onDelete) return;
+    setSaving(true);
+    setFormError(null);
+    try {
+      await onDelete();
+    } catch (caught) {
+      setFormError(errorMessage(caught));
       setSaving(false);
     }
   }
@@ -73,6 +87,11 @@ export function NoteEditor({ title, initial, onSave, onCancel }: NoteEditorProps
           <Button variant="ghost" onClick={onCancel}>
             Anuluj
           </Button>
+          {onDelete && (
+            <Button variant="danger" className="ml-auto" disabled={saving} onClick={handleDelete}>
+              Usuń karteczkę
+            </Button>
+          )}
         </div>
       </form>
     </aside>

@@ -27,3 +27,16 @@ export const noteCreateSchema = z.object({
 });
 
 export type NoteCreateInput = z.infer<typeof noteCreateSchema>;
+
+export const noteUpdateSchema = z
+  .object({
+    topic: topic.optional(),
+    imageWords: imageWords.optional(),
+    x: coordinate.optional(),
+    y: coordinate.optional(),
+  })
+  .refine((value) => Object.values(value).some((field) => field !== undefined), {
+    message: "Podaj co najmniej jedno pole do zmiany",
+  });
+
+export type NoteUpdateInput = z.infer<typeof noteUpdateSchema>;

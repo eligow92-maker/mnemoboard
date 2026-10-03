@@ -166,9 +166,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-003 / TASK-006 | AC-1 | tests/integration/us-003-add-note.test.tsx | AC-1: Given otwarta plansza, when dodaję karteczkę z zagadnieniem "1410 – bitwa pod Grunwaldem" w wybranym miejscu, then karteczka jest widoczna w tym miejscu z tym zagadnieniem. | Yes |
 | US-003 / TASK-006 | AC-2 | tests/integration/us-003-add-note.test.tsx | AC-2: Given formularz karteczki, when zatwierdzam puste zagadnienie, then karteczka nie powstaje i widzę komunikat "Wpisz zagadnienie". | Yes |
 | US-003 / TASK-006 | AC-3 | tests/integration/us-003-add-note.test.tsx | AC-3: Given plansza z dodaną karteczką, when odświeżam stronę, then karteczka ma to samo zagadnienie i to samo położenie. | Yes |
-| US-004 / TASK-007 | AC-1 | tests/e2e/us-004-edit-note.spec.ts | AC-1: Given karteczka na planszy, when przeciągam ją w inne miejsce i odświeżam stronę, then karteczka znajduje się w nowym miejscu. | Pending |
-| US-004 / TASK-007 | AC-2 | tests/integration/us-004-edit-note.test.tsx | AC-2: Given karteczka z zagadnieniem "1410", when zmieniam zagadnienie na "15.07.1410", then karteczka pokazuje nowe zagadnienie. | Pending |
-| US-004 / TASK-007 | AC-3 | tests/integration/us-004-edit-note.test.tsx | AC-3: Given karteczka mająca połączenia, when ją usuwam, then karteczka i wszystkie jej połączenia znikają z planszy. | Pending |
+| US-004 / TASK-007 | AC-1 | tests/e2e/us-004-edit-note.spec.ts | AC-1: Given karteczka na planszy, when przeciągam ją w inne miejsce i odświeżam stronę, then karteczka znajduje się w nowym miejscu. | Yes |
+| US-004 / TASK-007 | AC-2 | tests/integration/us-004-edit-note.test.tsx | AC-2: Given karteczka z zagadnieniem "1410", when zmieniam zagadnienie na "15.07.1410", then karteczka pokazuje nowe zagadnienie. | Yes |
+| US-004 / TASK-007 | AC-3 | tests/integration/us-004-edit-note.test.tsx | AC-3: Given karteczka mająca połączenia, when ją usuwam, then karteczka i wszystkie jej połączenia znikają z planszy. | Yes |
 | TASK-008 | AC-1 | tests/integration/peg-seed.test.ts | AC-1: Given pusta tabela peg_word, when uruchamiam seed, then tabela zawiera 110 haseł z niepustym słowem. | Pending |
 | TASK-008 | AC-2 | tests/unit/peg-seed.test.ts | AC-2: Given startowa lista GSP, when dekoduję spółgłoski każdego słowa według GSP, then wynik jest równy liczbie hasła. | Pending |
 | TASK-008 | AC-3 | tests/integration/peg-seed.test.ts | AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam seed, then hasło "14" nadal ma słowo "tur". | Pending |

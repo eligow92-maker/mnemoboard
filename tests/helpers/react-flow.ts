@@ -40,6 +40,19 @@ export function mockReactFlow(): void {
     offsetWidth: { configurable: true, get: () => 180 },
   });
 
+  // Bez wymiarów planszy React Flow uznaje, że wskaźnik jest przy krawędzi, i przesuwa widok (autopan).
+  globalThis.HTMLElement.prototype.getBoundingClientRect = () =>
+    ({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 1024,
+      bottom: 768,
+      width: 1024,
+      height: 768,
+    }) as DOMRect;
+
   (globalThis.SVGElement.prototype as unknown as { getBBox: () => DOMRect }).getBBox = () =>
     ({ x: 0, y: 0, width: 0, height: 0 }) as DOMRect;
 }
