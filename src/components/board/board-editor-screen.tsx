@@ -270,6 +270,12 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
       <Toast message={toast} onDismiss={dismissToast} />
       <div className="flex items-center gap-3 border-b border-border bg-surface px-4 py-2">
         <h1 className="min-w-0 flex-1 truncate text-xl font-bold">{board.name}</h1>
+        <Link
+          href={`/boards/${boardId}/review`}
+          className="inline-flex min-h-11 shrink-0 items-center rounded-md bg-primary px-4 font-medium text-white hover:bg-primary-dark"
+        >
+          Rozpocznij powtórkę
+        </Link>
       </div>
       <BoardToolbar
         mode={mode}

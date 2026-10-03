@@ -410,7 +410,7 @@ AC-2: Given plansza z luźnymi karteczkami utworzonymi w kolejności A, B, C, wh
 ---
 
 ### TASK-017: US-011 — Przebieg powtórki
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 `POST /api/boards/{id}/review-sessions`, `POST /api/review-sessions/{id}/results`, `POST /api/review-sessions/{id}/finish`; strona `/boards/[id]/review` z ReviewCard, ReviewActions, ReviewProgress i ReviewSummary.
@@ -424,14 +424,14 @@ AC-3: Given odsłonięta karteczka, when wybieram "Pamiętałem", then wynik zos
 AC-4: Given ostatnia karteczka powtórki została oceniona, when powtórka się kończy, then widzę podsumowanie z liczbą zapamiętanych, liczbą wszystkich i wynikiem procentowym.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-011, TASK-016
 **Blocks**: TASK-018, TASK-019

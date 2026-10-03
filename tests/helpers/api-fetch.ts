@@ -20,6 +20,18 @@ const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
   ["/api/connections/[connectionId]", () => import("@/app/api/connections/[connectionId]/route")],
   ["/api/boards/[boardId]/zones", () => import("@/app/api/boards/[boardId]/zones/route")],
   ["/api/zones/[zoneId]", () => import("@/app/api/zones/[zoneId]/route")],
+  [
+    "/api/boards/[boardId]/review-sessions",
+    () => import("@/app/api/boards/[boardId]/review-sessions/route"),
+  ],
+  [
+    "/api/review-sessions/[sessionId]/results",
+    () => import("@/app/api/review-sessions/[sessionId]/results/route"),
+  ],
+  [
+    "/api/review-sessions/[sessionId]/finish",
+    () => import("@/app/api/review-sessions/[sessionId]/finish/route"),
+  ],
   ["/api/word-images/generate", () => import("@/app/api/word-images/generate/route")],
   ["/api/peg-words", () => import("@/app/api/peg-words/route")],
   ["/api/peg-words/[number]", () => import("@/app/api/peg-words/[number]/route")],

@@ -73,3 +73,25 @@ export interface PegWordDto {
   isCustom: boolean;
   updatedAt: string;
 }
+
+export interface ReviewCardDto {
+  noteId: string;
+  topic: string;
+  imageWords: string;
+  zoneName: string | null;
+}
+
+export interface ReviewSessionStartDto {
+  id: string;
+  boardId: string;
+  startedAt: string;
+  cards: ReviewCardDto[];
+}
+
+export interface ReviewSummaryDto {
+  sessionId: string;
+  finishedAt: string;
+  rememberedCount: number;
+  totalCount: number;
+  percent: number;
+}
