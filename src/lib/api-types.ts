@@ -60,3 +60,8 @@ export interface BoardDetailDto extends BoardDto {
   zones: ZoneDto[];
   connections: ConnectionDto[];
 }
+
+export interface GeneratedWordImagesDto {
+  segments: { number: string; word: string }[];
+  imageWords: string;
+}

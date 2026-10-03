@@ -3,11 +3,14 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { TextAreaField } from "@/components/ui/field";
-import { ApiClientError, errorMessage } from "@/lib/api-client";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { api, ApiClientError, errorMessage } from "@/lib/api-client";
+import type { GeneratedWordImagesDto } from "@/lib/api-types";
 import { NOTE_TEXT_MAX_LENGTH, NOTE_TOPIC_REQUIRED_MESSAGE } from "@/modules/notes/schema";
 
 export interface NoteEditorValues {
   topic: string;
+  imageWords: string;
 }
 
 interface NoteEditorProps {
@@ -22,6 +25,9 @@ interface NoteEditorProps {
 // Panel boczny na komputerze, arkusz dolny na telefonie.
 export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
+  const [imageWords, setImageWords] = useState(initial.imageWords);
+  // Wygenerowane słowa czekające na potwierdzenie zastąpienia dotychczasowych.
+  const [pendingWords, setPendingWords] = useState<string | null>(null);
   const [topicError, setTopicError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -38,12 +44,29 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
     setTopicError(null);
     setFormError(null);
     try {
-      await onSave({ topic: trimmedTopic });
+      await onSave({ topic: trimmedTopic, imageWords: imageWords.trim() });
     } catch (caught) {
       const fieldError = caught instanceof ApiClientError ? caught.fields.topic : undefined;
       if (fieldError) setTopicError(fieldError);
       else setFormError(errorMessage(caught));
       setSaving(false);
+    }
+  }
+
+  async function handleGenerate(): Promise<void> {
+    if (topic.trim() === "") {
+      setTopicError(NOTE_TOPIC_REQUIRED_MESSAGE);
+      return;
+    }
+    setFormError(null);
+    try {
+      const generated = await api<GeneratedWordImagesDto>("/api/word-images/generate", "POST", {
+        topic,
+      });
+      if (imageWords.trim() === "") setImageWords(generated.imageWords);
+      else if (generated.imageWords !== imageWords.trim()) setPendingWords(generated.imageWords);
+    } catch (caught) {
+      setFormError(errorMessage(caught));
     }
   }
 
@@ -75,6 +98,16 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           error={topicError}
           autoFocus
         />
+        <TextAreaField
+          id="note-image-words"
+          label="Słowa-obrazy"
+          value={imageWords}
+          maxLength={NOTE_TEXT_MAX_LENGTH}
+          onChange={(event) => setImageWords(event.target.value)}
+        />
+        <Button variant="secondary" className="self-start" onClick={handleGenerate}>
+          Generuj słowa
+        </Button>
         {formError && (
           <p role="alert" className="text-sm text-error">
             {formError}
@@ -94,6 +127,19 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           )}
         </div>
       </form>
+      {pendingWords !== null && (
+        <ConfirmDialog
+          title="Zastąpić słowa-obrazy?"
+          confirmLabel="Zastąp"
+          onConfirm={() => {
+            setImageWords(pendingWords);
+            setPendingWords(null);
+          }}
+          onCancel={() => setPendingWords(null)}
+        >
+          Obecne słowa „{imageWords}” zostaną zastąpione przez „{pendingWords}”.
+        </ConfirmDialog>
+      )}
     </aside>
   );
 }

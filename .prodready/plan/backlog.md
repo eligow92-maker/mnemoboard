@@ -228,7 +228,7 @@ AC-4: Given hasło ze zmienionym słowem, when używam akcji "Przywróć domyśl
 ---
 
 ### TASK-010: US-006 — Generowanie słów-obrazów dla liczb
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 Czysta funkcja generatora (wyszukanie ciągów cyfr, podział na pary, pojedyncza cyfra na końcu); `POST /api/word-images/generate`; akcja "Generuj słowa" w NoteEditor z potwierdzeniem zastąpienia.
@@ -242,14 +242,14 @@ AC-3: Given karteczka z zagadnieniem "966", when używam akcji "Generuj słowa",
 AC-4: Given karteczka mająca już słowa-obrazy, when używam akcji "Generuj słowa", then dotychczasowe słowa pozostają bez zmian do chwili potwierdzenia zastąpienia.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-007, TASK-008
 **Blocks**: TASK-009, TASK-011
