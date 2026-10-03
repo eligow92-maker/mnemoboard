@@ -567,7 +567,7 @@ AC-2: Given karteczka z zagadnieniem `<script>alert(1)</script>`, when plansza j
 ---
 
 ### TASK-023: Wydajność dużej planszy
-**Priority**: P1 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P1 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Sprawdzenie celu z constraints: plansza z 200 karteczkami; `onlyRenderVisibleElements`; brak zapytań N+1 w `GET /api/boards/{id}`.
@@ -576,8 +576,8 @@ Sprawdzenie celu z constraints: plansza z 200 karteczkami; `onlyRenderVisibleEle
 AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wywołuję GET /api/boards/{id}, then odpowiedź przychodzi w czasie krótszym niż 500 ms.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
 
 **Blocked by**: TASK-015
 **Blocks**: None

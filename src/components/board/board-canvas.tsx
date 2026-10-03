@@ -209,6 +209,8 @@ function Canvas({
       edgesFocusable={false}
       // Zaznaczona strefa nie może wyjść nad karteczki.
       elevateNodesOnSelect={false}
+      // Duża plansza (do 200 karteczek): do DOM trafiają tylko elementy widoczne w oknie planszy.
+      onlyRenderVisibleElements
       minZoom={0.25}
       maxZoom={2}
       deleteKeyCode={null}

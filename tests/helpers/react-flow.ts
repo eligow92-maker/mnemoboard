@@ -35,9 +35,23 @@ export function mockReactFlow(): void {
   globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
   globalThis.DOMMatrixReadOnly = DOMMatrixReadOnlyMock as unknown as typeof DOMMatrixReadOnly;
 
+  // Plansza ma rozmiar okna 1024×768, każdy inny element — rozmiar karteczki. React Flow renderuje
+  // tylko elementy widoczne w oknie planszy, więc testowe położenia muszą się w nim mieścić.
+  const isCanvas = (element: HTMLElement): boolean =>
+    element.classList.contains("react-flow") || element.classList.contains("react-flow__renderer");
   Object.defineProperties(globalThis.HTMLElement.prototype, {
-    offsetHeight: { configurable: true, get: () => 96 },
-    offsetWidth: { configurable: true, get: () => 180 },
+    offsetHeight: {
+      configurable: true,
+      get(this: HTMLElement) {
+        return isCanvas(this) ? 768 : 96;
+      },
+    },
+    offsetWidth: {
+      configurable: true,
+      get(this: HTMLElement) {
+        return isCanvas(this) ? 1024 : 180;
+      },
+    },
   });
 
   // Bez wymiarów planszy React Flow uznaje, że wskaźnik jest przy krawędzi, i przesuwa widok (autopan).

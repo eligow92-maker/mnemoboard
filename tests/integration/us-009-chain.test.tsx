@@ -56,16 +56,18 @@ describe("TASK-013 US-009 Łańcuch skojarzeń", () => {
     await waitFor(() => expect(chainNumber(c)).toHaveTextContent("3"));
     expect(chainNumber(a)).toHaveTextContent("1");
     expect(chainNumber(b)).toHaveTextContent("2");
-    expect(
-      await prisma.connection.findMany({
-        where: { kind: "chain" },
-        orderBy: { createdAt: "asc" },
-        select: { sourceNoteId: true, targetNoteId: true },
-      }),
-    ).toEqual([
-      { sourceNoteId: a.id, targetNoteId: b.id },
-      { sourceNoteId: b.id, targetNoteId: c.id },
-    ]);
+    // Oba żądania wychodzą niemal jednocześnie, więc kolejność zapisu w bazie nie jest ustalona.
+    const links = await prisma.connection.findMany({
+      where: { kind: "chain" },
+      select: { sourceNoteId: true, targetNoteId: true },
+    });
+    expect(links).toHaveLength(2);
+    expect(links).toEqual(
+      expect.arrayContaining([
+        { sourceNoteId: a.id, targetNoteId: b.id },
+        { sourceNoteId: b.id, targetNoteId: c.id },
+      ]),
+    );
   });
 
   it('AC-2: ogniwo A→C dla karteczki A mającej już ogniwo A→B nie powstaje i pojawia się komunikat "Karteczka ma już następnik w łańcuchu"', async () => {

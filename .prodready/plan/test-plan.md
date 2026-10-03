@@ -216,7 +216,7 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-014 / TASK-021 | AC-3 | tests/e2e/us-014-mobile.spec.ts | AC-3: Given karteczka dodana na jednym urządzeniu, when otwieram tę planszę na drugim urządzeniu, then widzę tę karteczkę. | Yes |
 | TASK-022 | AC-1 | tests/integration/security.test.tsx | AC-1: Given dowolna odpowiedź aplikacji, when sprawdzam nagłówki, then zawiera `Content-Security-Policy` oraz `X-Content-Type-Options: nosniff`. | Yes |
 | TASK-022 | AC-2 | tests/integration/security.test.tsx | AC-2: Given karteczka z zagadnieniem `<script>alert(1)</script>`, when plansza ją renderuje, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | Yes |
-| TASK-023 | AC-1 | tests/integration/performance.test.ts | AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wywołuję GET /api/boards/{id}, then odpowiedź przychodzi w czasie krótszym niż 500 ms. | Pending |
+| TASK-023 | AC-1 | tests/integration/performance.test.ts | AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wywołuję GET /api/boards/{id}, then odpowiedź przychodzi w czasie krótszym niż 500 ms. | Yes |
 
 ## Technical Tests
 
