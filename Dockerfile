@@ -20,7 +20,7 @@ RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" npx prisma gene
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run dev"]
 
 FROM node:22-alpine AS builder
 WORKDIR /app

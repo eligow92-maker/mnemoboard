@@ -169,9 +169,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-004 / TASK-007 | AC-1 | tests/e2e/us-004-edit-note.spec.ts | AC-1: Given karteczka na planszy, when przeciągam ją w inne miejsce i odświeżam stronę, then karteczka znajduje się w nowym miejscu. | Yes |
 | US-004 / TASK-007 | AC-2 | tests/integration/us-004-edit-note.test.tsx | AC-2: Given karteczka z zagadnieniem "1410", when zmieniam zagadnienie na "15.07.1410", then karteczka pokazuje nowe zagadnienie. | Yes |
 | US-004 / TASK-007 | AC-3 | tests/integration/us-004-edit-note.test.tsx | AC-3: Given karteczka mająca połączenia, when ją usuwam, then karteczka i wszystkie jej połączenia znikają z planszy. | Yes |
-| TASK-008 | AC-1 | tests/integration/peg-seed.test.ts | AC-1: Given pusta tabela peg_word, when uruchamiam seed, then tabela zawiera 110 haseł z niepustym słowem. | Pending |
-| TASK-008 | AC-2 | tests/unit/peg-seed.test.ts | AC-2: Given startowa lista GSP, when dekoduję spółgłoski każdego słowa według GSP, then wynik jest równy liczbie hasła. | Pending |
-| TASK-008 | AC-3 | tests/integration/peg-seed.test.ts | AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam seed, then hasło "14" nadal ma słowo "tur". | Pending |
+| TASK-008 | AC-1 | tests/integration/peg-seed.test.ts | AC-1: Given pusta tabela peg_word, when uruchamiam seed, then tabela zawiera 110 haseł z niepustym słowem. | Yes |
+| TASK-008 | AC-2 | tests/unit/peg-seed.test.ts | AC-2: Given startowa lista GSP, when dekoduję spółgłoski każdego słowa według GSP, then wynik jest równy liczbie hasła. | Yes |
+| TASK-008 | AC-3 | tests/integration/peg-seed.test.ts | AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam seed, then hasło "14" nadal ma słowo "tur". | Yes |
 | US-007 / TASK-009 | AC-1 | tests/integration/us-007-peg-words.test.tsx | AC-1: Given świeżo zainstalowana aplikacja, when otwieram listę GSP, then widzę niepuste słowo dla każdego z 110 haseł (0–9 oraz 00–99). | Pending |
 | US-007 / TASK-009 | AC-2 | tests/integration/us-007-peg-words.test.tsx | AC-2: Given lista GSP, when zmieniam słowo dla "14" na "tur", then generowanie dla zagadnienia "14" zwraca "tur". | Pending |
 | US-007 / TASK-009 | AC-3 | tests/integration/us-007-peg-words.test.tsx | AC-3: Given lista GSP, when zapisuję puste słowo dla hasła, then zmiana jest odrzucona i hasło zachowuje poprzednie słowo. | Pending |

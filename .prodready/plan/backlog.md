@@ -175,7 +175,7 @@ AC-3: Given karteczka mająca połączenia, when ją usuwam, then karteczka i ws
 ---
 
 ### TASK-008: Startowa lista GSP i seed
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Przygotowanie 110 polskich słów startowych (0–9, 00–99) zgodnych z GSP; moduł `word-images/encoding` sprawdzający zgodność słowa z liczbą; idempotentny seed Prisma.
@@ -186,12 +186,12 @@ AC-2: Given startowa lista GSP, when dekoduję spółgłoski każdego słowa wed
 AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam seed, then hasło "14" nadal ma słowo "tur".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-002
 **Blocks**: TASK-009, TASK-010
