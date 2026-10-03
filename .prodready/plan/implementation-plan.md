@@ -1,0 +1,62 @@
+# Implementation Plan
+
+## Overview
+
+Project: Mnemoboard
+Pattern: Modular Monolith (Next.js: UI + API + moduły domenowe, PostgreSQL)
+Stack: TypeScript, Next.js 15, React 19, React Flow, Tailwind CSS 4, Zod, Prisma 6, PostgreSQL 16, Vitest, Playwright, Docker Compose
+
+Backlog: 23 zadania, 67 kryteriów akceptacji (46 z historyjek + 21 technicznych), 66 h.
+
+## Phases
+
+### Phase 1: Fundament i pierwszy przekrój (Sprint 1, 18.5 h)
+**Goal**: działający przekrój UI → API → baza → UI oraz rozbrojenie największego ryzyka.
+- Szkielet projektu, schemat bazy z regułami integralności, fundament API (TASK-001–003).
+- Prototyp planszy na React Flow z przeciąganiem myszą i dotykiem (TASK-004) — ryzyko jako pierwsze.
+- Utworzenie planszy i przyklejenie karteczki (TASK-005, TASK-006) — po tym sprincie można utworzyć planszę, dodać karteczkę i zobaczyć ją po odświeżeniu.
+
+### Phase 2: Karteczki i generator (Sprint 2, 14.5 h)
+**Goal**: kompletna karteczka ze słowami-obrazami.
+- Przesuwanie, edycja, usuwanie (TASK-007).
+- Startowa lista 110 słów GSP z automatycznym sprawdzeniem zgodności kodowania (TASK-008).
+- Generator dla liczb, edycja listy GSP, ręczne słowa-obrazy (TASK-009–011).
+
+### Phase 3: Układanie (Sprint 3, 12 h)
+**Goal**: trzy techniki na jednej planszy.
+- Połączenia mapy myśli (TASK-012), łańcuch z regułami i numeracją (TASK-013).
+- Geometria stref jako czysty moduł (TASK-014) i pokoje pałacu pamięci (TASK-015).
+
+### Phase 4: Powtórka, statystyki, telefon, dopracowanie (Sprint 4, 21 h)
+**Goal**: zamknięcie pętli nauki i mierników sukcesu.
+- Kolejność kart, przebieg i zakres powtórki (TASK-016–018).
+- Statystyki i zarządzanie planszami (TASK-019, TASK-020).
+- Dopracowanie na telefonie z testami E2E w profilu mobilnym (TASK-021).
+- Nagłówki bezpieczeństwa, XSS, wydajność planszy z 200 karteczkami (TASK-022, TASK-023).
+
+## Capacity Check
+
+- Timeline z constitution.md: brak twardego terminu, jedna osoba po godzinach.
+- Przy ok. 6 h tygodniowo backlog 66 h to ok. 11 tygodni; z buforem 30% na niedoszacowanie — ok. 16 tygodni.
+- Brak terminu oznacza, że plan nie wymaga cięcia zakresu; jedyne zadania P1 (TASK-020, TASK-023) są na końcu i można je odłożyć bez wpływu na pozostałe.
+
+## Risks & Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Przeciąganie dotykiem w React Flow koliduje z przesuwaniem widoku lub jest niewygodne na telefonie | High | TASK-004 w Sprincie 1 jako prototyp sprawdzony ręcznie na telefonie; wnioski w handoverze; w razie niepowodzenia powrót do ADR-004 przed budową reszty edytora |
+| TASK-015 (pokoje) trwa 3× dłużej — strefy pod węzłami, zmiana rozmiaru, przeliczanie przypisań | High | Reguły wydzielone do czystego modułu (TASK-014) testowanego jednostkowo; w UI dopuszczalne uproszczenie: strefa o stałym rozmiarze ustawianym w ZoneEditor zamiast uchwytów |
+| Startowa lista 110 polskich słów GSP jest słabej jakości lub niezgodna z kodowaniem | Medium | TASK-008 AC-2 automatycznie sprawdza zgodność każdego słowa z liczbą; lista jest edytowalna (US-007), więc jakość można poprawiać w użyciu |
+| Niestabilne testy E2E przeciągania | Medium | Reguły testowane na poziomie API/jednostkowym; E2E tylko dla 4 kryteriów wymagających prawdziwej przeglądarki |
+| Indeksy częściowe poza `schema.prisma` rozjadą się ze schematem | Medium | TASK-002 AC-2 i AC-3 testują reguły bezpośrednio na bazie |
+| Przypadkowe wystawienie aplikacji bez logowania do internetu | High | Ostrzeżenie w README/DEPLOYMENT (faza Build), odrzucanie obcego Origin (TASK-003), nagłówki bezpieczeństwa (TASK-022); logowanie jako warunek VPS |
+| Utrata danych przy awarii dysku (brak kopii w MVP) | Medium | Nazwany wolumen i cel `db-backup` w Makefile (faza Scaffold/Build) |
+
+## Dependencies
+
+External dependencies:
+- [x] Brak usług zewnętrznych, kont i kluczy API w czasie działania (non-negotiable).
+- [ ] Docker i Docker Compose na komputerze deweloperskim i serwerze domowym.
+- [ ] Dostęp do rejestru npm i Docker Hub w czasie budowania (nie w czasie działania).
+- [ ] Telefon w tej samej sieci lokalnej do ręcznego sprawdzenia TASK-004 i TASK-021.
+- [ ] Treść startowej listy GSP — do przygotowania w TASK-008 (decyzja autora, bez zależności od osób trzecich).

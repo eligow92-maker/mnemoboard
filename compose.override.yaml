@@ -1,0 +1,21 @@
+# Nadpisania deweloperskie — ładowane automatycznie przez `docker compose up`.
+services:
+  app:
+    build:
+      target: dev
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    command: sh -c "npx prisma migrate deploy && npm run dev"
+
+  db:
+    ports:
+      - '127.0.0.1:5432:5432'
+    healthcheck:
+      interval: 5s

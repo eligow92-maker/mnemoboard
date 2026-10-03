@@ -1,0 +1,980 @@
+openapi: 3.1.0
+info:
+  title: Mnemoboard API
+  version: 1.0.0
+  description: >
+    API aplikacji Mnemoboard — plansze z karteczkami, słowa-obrazy według
+    Głównego Systemu Pamięciowego, układanie (mapa myśli, łańcuch, pokoje)
+    oraz powtórki z samooceną. MVP działa w sieci lokalnej bez uwierzytelniania
+    (ADR-003). Każde żądanie modyfikujące z obcym nagłówkiem Origin jest
+    odrzucane odpowiedzią 403 (`FORBIDDEN_ORIGIN`).
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development
+  - url: http://mnemoboard.local:3000/api
+    description: Serwer domowy (sieć lokalna)
+
+# MVP bez uwierzytelniania (ADR-003) — jawnie puste wymagania bezpieczeństwa.
+security: []
+
+tags:
+  - name: boards
+    description: Plansze
+  - name: notes
+    description: Karteczki
+  - name: zones
+    description: Strefy-pokoje pałacu pamięci
+  - name: connections
+    description: Połączenia mapy myśli i ogniwa łańcucha
+  - name: word-images
+    description: Generator słów-obrazów i lista GSP
+  - name: review
+    description: Powtórki i statystyki
+  - name: system
+    description: Stan aplikacji
+
+paths:
+  /health:
+    get:
+      tags: [system]
+      summary: Stan aplikacji i połączenia z bazą
+      operationId: getHealth
+      responses:
+        '200':
+          description: Aplikacja działa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                required: [status]
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /boards:
+    get:
+      tags: [boards]
+      summary: Lista plansz z wynikiem ostatniej powtórki (US-001, US-013)
+      operationId: listBoards
+      responses:
+        '200':
+          description: Lista plansz (pusta przy pierwszym uruchomieniu)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoardSummary'
+    post:
+      tags: [boards]
+      summary: Utworzenie planszy (US-001)
+      operationId: createBoard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardInput'
+      responses:
+        '201':
+          description: Plansza utworzona
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /boards/{boardId}:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    get:
+      tags: [boards]
+      summary: Pełna zawartość planszy — karteczki, strefy, połączenia (US-003, US-014)
+      operationId: getBoard
+      responses:
+        '200':
+          description: Plansza z zawartością
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [boards]
+      summary: Zmiana nazwy planszy (US-002)
+      operationId: updateBoard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardInput'
+      responses:
+        '200':
+          description: Plansza zaktualizowana
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [boards]
+      summary: Usunięcie planszy wraz z zawartością i wynikami powtórek (US-002)
+      operationId: deleteBoard
+      responses:
+        '204':
+          description: Plansza usunięta
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boards/{boardId}/notes:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    post:
+      tags: [notes]
+      summary: Przyklejenie karteczki do planszy (US-003)
+      description: Serwer wylicza `zoneId` z położenia karteczki.
+      operationId: createNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreate'
+      responses:
+        '201':
+          description: Karteczka utworzona
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notes/{noteId}:
+    parameters:
+      - $ref: '#/components/parameters/NoteId'
+    patch:
+      tags: [notes]
+      summary: Edycja treści lub położenia karteczki (US-004, US-005, US-010)
+      description: >
+        Przy zmianie położenia serwer ponownie wylicza `zoneId`
+        (środek karteczki wewnątrz strefy; poza strefami — null).
+      operationId: updateNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdate'
+      responses:
+        '200':
+          description: Karteczka zaktualizowana
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [notes]
+      summary: Usunięcie karteczki wraz z jej połączeniami (US-004)
+      operationId: deleteNote
+      responses:
+        '204':
+          description: Karteczka usunięta
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boards/{boardId}/zones:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    post:
+      tags: [zones]
+      summary: Utworzenie strefy-pokoju (US-010)
+      description: Karteczki leżące w obrębie nowej strefy zostają do niej przypisane.
+      operationId: createZone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneCreate'
+      responses:
+        '201':
+          description: Strefa utworzona
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneWithNotes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /zones/{zoneId}:
+    parameters:
+      - $ref: '#/components/parameters/ZoneId'
+    patch:
+      tags: [zones]
+      summary: Zmiana nazwy, położenia lub rozmiaru strefy (US-010)
+      description: Po zmianie geometrii serwer przelicza przypisania karteczek planszy.
+      operationId: updateZone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneUpdate'
+      responses:
+        '200':
+          description: Strefa zaktualizowana
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneWithNotes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [zones]
+      summary: Usunięcie strefy; karteczki pozostają bez pokoju (US-010)
+      operationId: deleteZone
+      responses:
+        '204':
+          description: Strefa usunięta
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boards/{boardId}/connections:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    post:
+      tags: [connections]
+      summary: Połączenie dwóch karteczek linią lub ogniwem łańcucha (US-008, US-009)
+      description: >
+        Kody błędów 409: `CONNECTION_EXISTS` (para już połączona),
+        `CHAIN_SUCCESSOR_EXISTS` (karteczka ma już następnik),
+        `CHAIN_PREDECESSOR_EXISTS` (karteczka ma już poprzednik),
+        `CHAIN_CYCLE` (ogniwo zamknęłoby pętlę).
+      operationId: createConnection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectionCreate'
+      responses:
+        '201':
+          description: Połączenie utworzone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Connection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /connections/{connectionId}:
+    parameters:
+      - $ref: '#/components/parameters/ConnectionId'
+    delete:
+      tags: [connections]
+      summary: Usunięcie połączenia; karteczki pozostają (US-008)
+      operationId: deleteConnection
+      responses:
+        '204':
+          description: Połączenie usunięte
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /word-images/generate:
+    post:
+      tags: [word-images]
+      summary: Wygenerowanie słów-obrazów dla liczb w zagadnieniu (US-005, US-006)
+      description: >
+        Wyszukuje ciągi cyfr, dzieli każdy na pary od lewej (ostatnia pojedyncza
+        cyfra osobno) i podstawia słowa z listy GSP. Nie zapisuje niczego —
+        klient decyduje o zastąpieniu istniejących słów-obrazów karteczki.
+        Błąd 422 z kodem `NO_DIGITS`, gdy zagadnienie nie zawiera cyfr.
+      operationId: generateWordImages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+              required: [topic]
+      responses:
+        '200':
+          description: Wygenerowane słowa-obrazy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratedWordImages'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /peg-words:
+    get:
+      tags: [word-images]
+      summary: Lista 110 haseł GSP (US-007)
+      operationId: listPegWords
+      responses:
+        '200':
+          description: Hasła posortowane — najpierw 0–9, potem 00–99
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PegWord'
+
+  /peg-words/{number}:
+    parameters:
+      - $ref: '#/components/parameters/PegNumber'
+    put:
+      tags: [word-images]
+      summary: Zmiana słowa dla hasła (US-007)
+      operationId: updatePegWord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                word:
+                  type: string
+                  minLength: 1
+                  maxLength: 40
+              required: [word]
+      responses:
+        '200':
+          description: Hasło zaktualizowane
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PegWord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /peg-words/{number}/reset:
+    parameters:
+      - $ref: '#/components/parameters/PegNumber'
+    post:
+      tags: [word-images]
+      summary: Przywrócenie słowa domyślnego (US-007)
+      operationId: resetPegWord
+      responses:
+        '200':
+          description: Hasło ze słowem startowym
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PegWord'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boards/{boardId}/review-sessions:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    post:
+      tags: [review]
+      summary: Rozpoczęcie powtórki planszy (US-011, US-012)
+      description: >
+        Zwraca karty w kolejności powtórki: najpierw łańcuchy po kolei, potem
+        pozostałe karteczki według daty utworzenia. Karteczki bez słów-obrazów
+        są pomijane. Błąd 422 z kodem `NO_REVIEWABLE_NOTES`, gdy żadna karteczka
+        nie ma słów-obrazów.
+      operationId: startReviewSession
+      responses:
+        '201':
+          description: Sesja rozpoczęta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSessionStart'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /review-sessions/{sessionId}/results:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      tags: [review]
+      summary: Zapis samooceny karteczki (US-011)
+      description: >
+        Błędy 409: `RESULT_EXISTS` (karteczka już oceniona w tej sesji),
+        `SESSION_FINISHED` (sesja zakończona).
+      operationId: recordReviewResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                noteId:
+                  type: string
+                  format: uuid
+                remembered:
+                  type: boolean
+              required: [noteId, remembered]
+      responses:
+        '201':
+          description: Wynik zapisany z bieżącą datą
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /review-sessions/{sessionId}/finish:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      tags: [review]
+      summary: Zakończenie powtórki i podsumowanie (US-011)
+      operationId: finishReviewSession
+      responses:
+        '200':
+          description: Podsumowanie sesji
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSummary'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /stats:
+    get:
+      tags: [review]
+      summary: Statystyki regularności (US-013)
+      operationId: getStats
+      responses:
+        '200':
+          description: Liczba ukończonych powtórek z ostatnich 7 dni
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
+
+components:
+  parameters:
+    BoardId:
+      name: boardId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    NoteId:
+      name: noteId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ZoneId:
+      name: zoneId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ConnectionId:
+      name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PegNumber:
+      name: number
+      in: path
+      required: true
+      description: Hasło GSP — "0"–"9" lub "00"–"99"
+      schema:
+        type: string
+        pattern: '^[0-9]{1,2}$'
+
+  schemas:
+    Board:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, name, createdAt, updatedAt]
+
+    BoardInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Po obcięciu białych znaków nie może być pusta
+      required: [name]
+
+    LastReview:
+      type: object
+      properties:
+        finishedAt:
+          type: string
+          format: date-time
+        rememberedCount:
+          type: integer
+          minimum: 0
+        totalCount:
+          type: integer
+          minimum: 1
+        percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Zaokrąglony odsetek zapamiętanych karteczek
+      required: [finishedAt, rememberedCount, totalCount, percent]
+
+    BoardSummary:
+      allOf:
+        - $ref: '#/components/schemas/Board'
+        - type: object
+          properties:
+            noteCount:
+              type: integer
+              minimum: 0
+            lastReview:
+              description: null, gdy plansza nie ma ukończonej powtórki
+              oneOf:
+                - $ref: '#/components/schemas/LastReview'
+                - type: 'null'
+          required: [noteCount, lastReview]
+
+    BoardDetail:
+      allOf:
+        - $ref: '#/components/schemas/Board'
+        - type: object
+          properties:
+            notes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Note'
+            zones:
+              type: array
+              items:
+                $ref: '#/components/schemas/Zone'
+            connections:
+              type: array
+              items:
+                $ref: '#/components/schemas/Connection'
+          required: [notes, zones, connections]
+
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        boardId:
+          type: string
+          format: uuid
+        zoneId:
+          type: [string, 'null']
+          format: uuid
+        topic:
+          type: string
+        imageWords:
+          type: [string, 'null']
+        x:
+          type: number
+        y:
+          type: number
+        chainPosition:
+          type: [integer, 'null']
+          minimum: 1
+          description: Numer kolejności w łańcuchu (wyliczany); null poza łańcuchem
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, boardId, zoneId, topic, imageWords, x, y, chainPosition, createdAt, updatedAt]
+
+    NoteCreate:
+      type: object
+      properties:
+        topic:
+          type: string
+          minLength: 1
+          maxLength: 500
+        imageWords:
+          type: [string, 'null']
+          maxLength: 500
+        x:
+          type: number
+        y:
+          type: number
+      required: [topic, x, y]
+
+    NoteUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        topic:
+          type: string
+          minLength: 1
+          maxLength: 500
+        imageWords:
+          type: [string, 'null']
+          maxLength: 500
+        x:
+          type: number
+        y:
+          type: number
+
+    Zone:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        boardId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        width:
+          type: number
+          exclusiveMinimum: 0
+        height:
+          type: number
+          exclusiveMinimum: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, boardId, name, x, y, width, height, createdAt, updatedAt]
+
+    ZoneCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        x:
+          type: number
+        y:
+          type: number
+        width:
+          type: number
+          exclusiveMinimum: 0
+        height:
+          type: number
+          exclusiveMinimum: 0
+      required: [name, x, y, width, height]
+
+    ZoneUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        x:
+          type: number
+        y:
+          type: number
+        width:
+          type: number
+          exclusiveMinimum: 0
+        height:
+          type: number
+          exclusiveMinimum: 0
+
+    ZoneWithNotes:
+      allOf:
+        - $ref: '#/components/schemas/Zone'
+        - type: object
+          properties:
+            noteIds:
+              type: array
+              description: Karteczki przypisane do strefy po przeliczeniu
+              items:
+                type: string
+                format: uuid
+          required: [noteIds]
+
+    Connection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        boardId:
+          type: string
+          format: uuid
+        sourceNoteId:
+          type: string
+          format: uuid
+        targetNoteId:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ConnectionKind'
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, boardId, sourceNoteId, targetNoteId, kind, createdAt]
+
+    ConnectionKind:
+      type: string
+      enum: [association, chain]
+      description: association — linia mapy myśli; chain — skierowane ogniwo łańcucha
+
+    ConnectionCreate:
+      type: object
+      properties:
+        sourceNoteId:
+          type: string
+          format: uuid
+        targetNoteId:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ConnectionKind'
+      required: [sourceNoteId, targetNoteId, kind]
+
+    GeneratedWordImages:
+      type: object
+      properties:
+        segments:
+          type: array
+          items:
+            type: object
+            properties:
+              number:
+                type: string
+                pattern: '^[0-9]{1,2}$'
+              word:
+                type: string
+            required: [number, word]
+        imageWords:
+          type: string
+          description: Słowa połączone przecinkami, gotowe do wpisania w karteczkę
+      required: [segments, imageWords]
+
+    PegWord:
+      type: object
+      properties:
+        number:
+          type: string
+          pattern: '^[0-9]{1,2}$'
+        word:
+          type: string
+        defaultWord:
+          type: string
+        isCustom:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+      required: [number, word, defaultWord, isCustom, updatedAt]
+
+    ReviewCard:
+      type: object
+      properties:
+        noteId:
+          type: string
+          format: uuid
+        topic:
+          type: string
+          description: Widoczne od razu
+        imageWords:
+          type: string
+          description: Zakryte w interfejsie do chwili wybrania "Odsłoń"
+        zoneName:
+          type: [string, 'null']
+          description: Nazwa pokoju, odsłaniana razem ze słowami-obrazami
+      required: [noteId, topic, imageWords, zoneName]
+
+    ReviewSessionStart:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        boardId:
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        cards:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ReviewCard'
+      required: [id, boardId, startedAt, cards]
+
+    ReviewResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionId:
+          type: string
+          format: uuid
+        noteId:
+          type: string
+          format: uuid
+        remembered:
+          type: boolean
+        answeredAt:
+          type: string
+          format: date-time
+      required: [id, sessionId, noteId, remembered, answeredAt]
+
+    ReviewSummary:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        finishedAt:
+          type: string
+          format: date-time
+        rememberedCount:
+          type: integer
+          minimum: 0
+        totalCount:
+          type: integer
+          minimum: 0
+        percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+      required: [sessionId, finishedAt, rememberedCount, totalCount, percent]
+
+    Stats:
+      type: object
+      properties:
+        sessionsLast7Days:
+          type: integer
+          minimum: 0
+      required: [sessionsLast7Days]
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Stabilny kod maszynowy, np. VALIDATION_ERROR, CHAIN_CYCLE
+        message:
+          type: string
+          description: Komunikat po polsku do wyświetlenia użytkownikowi
+        fields:
+          type: object
+          description: Błędy walidacji per pole
+          additionalProperties:
+            type: string
+      required: [code, message]
+
+  responses:
+    Forbidden:
+      description: Żądanie modyfikujące z obcego Origin
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Niepoprawne dane wejściowe
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Zasób nie istnieje
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Naruszenie reguły domenowej
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unprocessable:
+      description: Żądanie poprawne, ale niewykonalne w bieżącym stanie
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Baza danych niedostępna
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

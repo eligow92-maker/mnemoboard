@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build
+.next
+dist
+build
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# Testing
+coverage
+test-results
+playwright-report
+
+# Misc
+*.md
+!README.md
+.DS_Store
+
+# Agent / ProdReady artifacts
+.prodready
+.claude
