@@ -50,7 +50,7 @@ AC-3: Given ogniwo łańcucha A→B, when zapisuję w bazie ogniwo łańcucha A�
 ---
 
 ### TASK-003: Fundament API
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Wspólna funkcja `withApi` dla handlerów (ADR-003): parsowanie JSON, walidacja Zod, jednolity format błędu `{code, message, fields}`, odrzucanie żądań modyfikujących z obcym `Origin`; endpoint `GET /api/health`.
@@ -61,12 +61,12 @@ AC-2: Given endpoint przyjmujący JSON, when wysyłam niepoprawny JSON, then otr
 AC-3: Given żądanie POST z nagłówkiem Origin innej witryny, when trafia do API, then otrzymuję status 403 z kodem `FORBIDDEN_ORIGIN`.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-002
 **Blocks**: TASK-005, TASK-009

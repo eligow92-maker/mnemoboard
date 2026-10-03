@@ -155,9 +155,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | TASK-002 | AC-1 | tests/integration/db-schema.test.ts | AC-1: Given pusta baza, when wykonuję migracje, then istnieją tabele board, zone, note, connection, peg_word, review_session i review_result. | Yes |
 | TASK-002 | AC-2 | tests/integration/db-schema.test.ts | AC-2: Given połączenie karteczek A–B, when zapisuję w bazie drugie połączenie tej samej pary w odwrotnym kierunku, then baza odrzuca zapis błędem unikalności. | Yes |
 | TASK-002 | AC-3 | tests/integration/db-schema.test.ts | AC-3: Given ogniwo łańcucha A→B, when zapisuję w bazie ogniwo łańcucha A→C, then baza odrzuca zapis błędem unikalności. | Yes |
-| TASK-003 | AC-1 | tests/integration/api-foundation.test.ts | AC-1: Given działająca baza, when wywołuję GET /api/health, then otrzymuję status 200 i treść `{"status":"ok"}`. | Pending |
-| TASK-003 | AC-2 | tests/integration/api-foundation.test.ts | AC-2: Given endpoint przyjmujący JSON, when wysyłam niepoprawny JSON, then otrzymuję status 400 z kodem `VALIDATION_ERROR`. | Pending |
-| TASK-003 | AC-3 | tests/integration/api-foundation.test.ts | AC-3: Given żądanie POST z nagłówkiem Origin innej witryny, when trafia do API, then otrzymuję status 403 z kodem `FORBIDDEN_ORIGIN`. | Pending |
+| TASK-003 | AC-1 | tests/integration/api-foundation.test.ts | AC-1: Given działająca baza, when wywołuję GET /api/health, then otrzymuję status 200 i treść `{"status":"ok"}`. | Yes |
+| TASK-003 | AC-2 | tests/integration/api-foundation.test.ts | AC-2: Given endpoint przyjmujący JSON, when wysyłam niepoprawny JSON, then otrzymuję status 400 z kodem `VALIDATION_ERROR`. | Yes |
+| TASK-003 | AC-3 | tests/integration/api-foundation.test.ts | AC-3: Given żądanie POST z nagłówkiem Origin innej witryny, when trafia do API, then otrzymuję status 403 z kodem `FORBIDDEN_ORIGIN`. | Yes |
 | TASK-004 | AC-1 | tests/integration/board-canvas.test.tsx | AC-1: Given plansza z jedną karteczką, when renderuję BoardCanvas, then widzę węzeł z zagadnieniem tej karteczki. | Pending |
 | TASK-004 | AC-2 | tests/integration/board-canvas.test.tsx | AC-2: Given karteczka na planszy, when kończę jej przeciąganie, then BoardCanvas wywołuje `onNoteMove` z identyfikatorem karteczki i nowym położeniem. | Pending |
 | US-001 / TASK-005 | AC-1 | tests/integration/us-001-create-board.test.tsx | AC-1: Given w aplikacji nie ma żadnej planszy, when otwieram aplikację, then widzę pusty stan z komunikatem i przyciskiem "Utwórz pierwszą planszę". | Pending |
