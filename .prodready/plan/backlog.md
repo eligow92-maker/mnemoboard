@@ -282,7 +282,7 @@ AC-2: Given karteczka z zagadnieniem bez cyfr, when używam akcji "Generuj słow
 ## Sprint 3: Układanie karteczek
 
 ### TASK-012: US-008 — Połączenia mapy myśli
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 `POST /api/boards/{id}/connections` (kind=association), `DELETE /api/connections/{id}`; krawędź AssociationEdge; kod `CONNECTION_EXISTS`.
@@ -295,12 +295,12 @@ AC-2: Given dwie już połączone karteczki, when łączę je ponownie, then dru
 AC-3: Given połączenie dwóch karteczek, when usuwam połączenie, then linia znika, a obie karteczki pozostają na planszy.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-007
 **Blocks**: TASK-013

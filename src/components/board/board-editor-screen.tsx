@@ -3,22 +3,26 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
-import type { BoardDetailDto, NoteDto } from "@/lib/api-types";
-import { BoardCanvas, type Position } from "./board-canvas";
-import { BoardToolbar } from "./board-toolbar";
+import type { BoardDetailDto, ConnectionDto, NoteDto } from "@/lib/api-types";
+import { BoardCanvas } from "./board-canvas";
+import { BoardToolbar, type EditorMode } from "./board-toolbar";
+import { ConnectionPanel } from "./connection-panel";
+import { NOTE_HEIGHT, NOTE_WIDTH, type Position } from "./dimensions";
 import { Toast } from "@/components/ui/toast";
 import { NoteEditor, type NoteEditorValues } from "./note-editor";
 
-// Rozmiar karteczki z tokenów — wskazany punkt planszy staje się środkiem nowej karteczki.
-export const NOTE_WIDTH = 180;
-export const NOTE_HEIGHT = 96;
+type Panel =
+  | { kind: "new-note"; position: Position }
+  | { kind: "note"; noteId: string }
+  | { kind: "connection"; connectionId: string }
+  | null;
 
-type Panel = { kind: "new-note"; position: Position } | { kind: "note"; noteId: string } | null;
+const IDLE: EditorMode = { kind: "idle" };
 
 export function BoardEditorScreen({ boardId }: { boardId: string }) {
   const [board, setBoard] = useState<BoardDetailDto | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [placingNote, setPlacingNote] = useState(false);
+  const [mode, setMode] = useState<EditorMode>(IDLE);
   const [panel, setPanel] = useState<Panel>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -50,14 +54,15 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
 
   const handlePaneClick = useCallback(
     (position: Position) => {
-      if (!placingNote) return;
-      setPlacingNote(false);
+      if (mode.kind !== "place-note") return;
+      setMode(IDLE);
+      // Wskazany punkt planszy staje się środkiem nowej karteczki.
       setPanel({
         kind: "new-note",
         position: { x: position.x - NOTE_WIDTH / 2, y: position.y - NOTE_HEIGHT / 2 },
       });
     },
-    [placingNote],
+    [mode.kind],
   );
 
   // Położenie zapisywane raz, po upuszczeniu; przy błędzie wracamy do stanu z serwera.
@@ -82,13 +87,64 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
     [loadBoard, replaceNote],
   );
 
+  const connect = useCallback(
+    async (sourceNoteId: string, targetNoteId: string, kind: ConnectionDto["kind"]) => {
+      try {
+        const connection = await api<ConnectionDto>(`/api/boards/${boardId}/connections`, "POST", {
+          sourceNoteId,
+          targetNoteId,
+          kind,
+        });
+        setBoard(
+          (current) => current && { ...current, connections: [...current.connections, connection] },
+        );
+      } catch (error) {
+        setToast(errorMessage(error));
+      }
+    },
+    [boardId],
+  );
+
   const handleNoteClick = useCallback(
     (noteId: string) => {
-      if (placingNote) return;
+      if (mode.kind === "place-note") return;
+      if (mode.kind === "connect") {
+        if (mode.sourceId === null) {
+          setMode({ ...mode, sourceId: noteId });
+        } else if (mode.sourceId !== noteId) {
+          void connect(mode.sourceId, noteId, mode.connection);
+          setMode({ ...mode, sourceId: null });
+        }
+        return;
+      }
       setPanel({ kind: "note", noteId });
     },
-    [placingNote],
+    [mode, connect],
   );
+
+  const handleConnectionClick = useCallback(
+    (connectionId: string) => {
+      if (mode.kind !== "idle") return;
+      setPanel({ kind: "connection", connectionId });
+    },
+    [mode.kind],
+  );
+
+  async function deleteConnection(connectionId: string): Promise<void> {
+    try {
+      await api<void>(`/api/connections/${connectionId}`, "DELETE");
+      setBoard(
+        (current) =>
+          current && {
+            ...current,
+            connections: current.connections.filter((connection) => connection.id !== connectionId),
+          },
+      );
+      setPanel(null);
+    } catch (error) {
+      setToast(errorMessage(error));
+    }
+  }
 
   async function createNote(position: Position, values: NoteEditorValues): Promise<void> {
     const note = await api<NoteDto>(`/api/boards/${boardId}/notes`, "POST", {
@@ -145,6 +201,12 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
 
   const editedNote =
     panel?.kind === "note" ? board.notes.find((note) => note.id === panel.noteId) : undefined;
+  const selectedConnection =
+    panel?.kind === "connection"
+      ? board.connections.find((connection) => connection.id === panel.connectionId)
+      : undefined;
+  const topicOf = (noteId: string): string =>
+    board.notes.find((note) => note.id === noteId)?.topic ?? "";
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
@@ -153,22 +215,25 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         <h1 className="min-w-0 flex-1 truncate text-xl font-bold">{board.name}</h1>
       </div>
       <BoardToolbar
-        placingNote={placingNote}
-        onAddNote={() => {
+        mode={mode}
+        onModeChange={(next) => {
           setPanel(null);
-          setPlacingNote(true);
+          setMode(next);
         }}
-        onCancelPlacing={() => setPlacingNote(false)}
       />
       <div className="relative flex min-h-0 flex-1">
         <BoardCanvas
           notes={board.notes}
+          connections={board.connections}
           onNoteMove={handleNoteMove}
           onNoteClick={handleNoteClick}
+          onConnectionClick={handleConnectionClick}
           onPaneClick={handlePaneClick}
-          placing={placingNote}
+          placing={mode.kind === "place-note"}
+          highlightedNoteId={mode.kind === "connect" ? mode.sourceId : null}
+          selectedConnectionId={selectedConnection?.id ?? null}
         />
-        {board.notes.length === 0 && !placingNote && panel === null && (
+        {board.notes.length === 0 && mode.kind === "idle" && panel === null && (
           <p className="pointer-events-none absolute inset-x-4 top-4 text-center text-text-secondary">
             Plansza jest pusta. Wybierz „Dodaj karteczkę” i wskaż miejsce.
           </p>
@@ -189,6 +254,15 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
             onSave={(values) => saveNote(editedNote.id, values)}
             onCancel={() => setPanel(null)}
             onDelete={() => deleteNote(editedNote.id)}
+          />
+        )}
+        {selectedConnection && (
+          <ConnectionPanel
+            sourceTopic={topicOf(selectedConnection.sourceNoteId)}
+            targetTopic={topicOf(selectedConnection.targetNoteId)}
+            chain={selectedConnection.kind === "chain"}
+            onDelete={() => deleteConnection(selectedConnection.id)}
+            onClose={() => setPanel(null)}
           />
         )}
       </div>

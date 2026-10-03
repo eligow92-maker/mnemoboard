@@ -1,8 +1,6 @@
 import { fireEvent, screen } from "@testing-library/react";
 
-// Rozmiar karteczki z tokenów (note-width × note-min-height).
-export const NOTE_WIDTH = 180;
-export const NOTE_HEIGHT = 96;
+export { NOTE_HEIGHT, NOTE_WIDTH } from "@/components/board/dimensions";
 
 export function getNoteNode(noteId: string): HTMLElement {
   return screen.getByTestId(`rf__node-${noteId}`);

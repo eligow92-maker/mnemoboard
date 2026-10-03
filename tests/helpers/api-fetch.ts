@@ -13,6 +13,11 @@ const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
   ["/api/boards/[boardId]", () => import("@/app/api/boards/[boardId]/route")],
   ["/api/boards/[boardId]/notes", () => import("@/app/api/boards/[boardId]/notes/route")],
   ["/api/notes/[noteId]", () => import("@/app/api/notes/[noteId]/route")],
+  [
+    "/api/boards/[boardId]/connections",
+    () => import("@/app/api/boards/[boardId]/connections/route"),
+  ],
+  ["/api/connections/[connectionId]", () => import("@/app/api/connections/[connectionId]/route")],
   ["/api/word-images/generate", () => import("@/app/api/word-images/generate/route")],
   ["/api/peg-words", () => import("@/app/api/peg-words/route")],
   ["/api/peg-words/[number]", () => import("@/app/api/peg-words/[number]/route")],
