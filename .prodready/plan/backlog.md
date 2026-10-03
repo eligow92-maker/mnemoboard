@@ -308,7 +308,7 @@ AC-3: Given połączenie dwóch karteczek, when usuwam połączenie, then linia 
 ---
 
 ### TASK-013: US-009 — Łańcuch skojarzeń
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 Ogniwa `kind=chain`; moduł `arrangement/chain` (następnik, poprzednik, wykrywanie pętli, wyliczanie `chainPosition`); krawędź ChainEdge, numer na karteczce, komunikaty błędów jako Toast.
@@ -321,12 +321,12 @@ AC-2: Given karteczka A z ogniwem wychodzącym A→B, when tworzę ogniwo A→C,
 AC-3: Given łańcuch A→B→C, when tworzę ogniwo C→A, then ogniwo nie powstaje i widzę komunikat "Łańcuch nie może tworzyć pętli".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-012
 **Blocks**: TASK-016

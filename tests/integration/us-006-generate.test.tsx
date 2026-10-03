@@ -5,7 +5,7 @@ import { BoardEditorScreen } from "@/components/board/board-editor-screen";
 import { prisma } from "@/lib/db";
 import { seedPegWords } from "@/modules/word-images/seed";
 import { apiFetch, installApiFetch } from "../helpers/api-fetch";
-import { getNoteNode } from "../helpers/board";
+import { clickNote } from "../helpers/board";
 import { resetDb } from "../helpers/db";
 import { mockReactFlow } from "../helpers/react-flow";
 
@@ -18,7 +18,7 @@ describe("TASK-010 US-006 Generowanie słów-obrazów dla liczb", () => {
     const user = userEvent.setup();
     const note = await prisma.note.create({ data: { boardId, topic, imageWords, x: 100, y: 100 } });
     render(<BoardEditorScreen boardId={boardId} />);
-    await user.click(await waitFor(() => getNoteNode(note.id)));
+    await clickNote(note.id);
     await user.click(await screen.findByRole("button", { name: "Generuj słowa" }));
     return { user, note };
   }

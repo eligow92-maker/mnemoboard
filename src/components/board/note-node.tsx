@@ -3,6 +3,8 @@ import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 export interface NoteNodeData extends Record<string, unknown> {
   topic: string;
   imageWords: string | null;
+  // Numer kolejności w łańcuchu; null poza łańcuchem.
+  chainPosition: number | null;
   // Karteczka wskazana jako początek tworzonego połączenia.
   highlighted: boolean;
 }
@@ -16,7 +18,7 @@ const HANDLE_CLASS = "!pointer-events-none !top-1/2 !left-1/2 !h-px !w-px !borde
 export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) {
   return (
     <div
-      className={`min-h-24 w-[180px] rounded-sm border p-2 text-sm text-text-primary ${
+      className={`relative min-h-24 w-[180px] rounded-sm border p-2 text-sm text-text-primary ${
         selected || data.highlighted
           ? "border-primary bg-note-selected"
           : "border-note-border bg-note"
@@ -30,6 +32,14 @@ export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) 
         isConnectable={false}
         className={HANDLE_CLASS}
       />
+      {data.chainPosition !== null && (
+        <span
+          aria-label={`Kolejność w łańcuchu: ${data.chainPosition}`}
+          className="absolute -top-3 -right-3 flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-1 text-xs font-bold text-white shadow-note"
+        >
+          {data.chainPosition}
+        </span>
+      )}
       <p className="font-medium break-words whitespace-pre-wrap">{data.topic}</p>
       {data.imageWords && (
         <p className="mt-1 break-words whitespace-pre-wrap text-text-secondary">

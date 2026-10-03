@@ -17,7 +17,8 @@ function modeHint(mode: EditorMode): string {
     case "place-note":
       return "Wskaż miejsce na planszy";
     case "connect":
-      return mode.sourceId === null ? "Wskaż pierwszą karteczkę" : "Wskaż drugą karteczkę";
+      if (mode.sourceId === null) return "Wskaż pierwszą karteczkę";
+      return mode.connection === "chain" ? "Wskaż następną karteczkę" : "Wskaż drugą karteczkę";
     default:
       return "";
   }
@@ -41,6 +42,12 @@ export function BoardToolbar({ mode, onModeChange }: BoardToolbarProps) {
             }
           >
             Połącz karteczki
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => onModeChange({ kind: "connect", connection: "chain", sourceId: null })}
+          >
+            Połącz w łańcuch
           </Button>
         </>
       ) : (

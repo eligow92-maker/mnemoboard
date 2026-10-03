@@ -5,7 +5,7 @@ import { BoardEditorScreen } from "@/components/board/board-editor-screen";
 import type { BoardDetailDto } from "@/lib/api-types";
 import { prisma } from "@/lib/db";
 import { apiFetch, apiJson, installApiFetch } from "../helpers/api-fetch";
-import { getNoteNode, nodePosition } from "../helpers/board";
+import { clickNote, getNoteNode, nodePosition } from "../helpers/board";
 import { resetDb } from "../helpers/db";
 import { dragElement, mockReactFlow } from "../helpers/react-flow";
 
@@ -35,7 +35,7 @@ describe("TASK-007 US-004 Przesuwanie, edycja i usuwanie karteczki", () => {
     const note = await createNote("1410");
     render(<BoardEditorScreen boardId={boardId} />);
 
-    await user.click(await waitFor(() => getNoteNode(note.id)));
+    await clickNote(note.id);
     const topic = await screen.findByLabelText("Zagadnienie");
     expect(topic).toHaveValue("1410");
     await user.clear(topic);
@@ -64,7 +64,7 @@ describe("TASK-007 US-004 Przesuwanie, edycja i usuwanie karteczki", () => {
     });
     render(<BoardEditorScreen boardId={boardId} />);
 
-    await user.click(await waitFor(() => getNoteNode(a.id)));
+    await clickNote(a.id);
     await user.click(await screen.findByRole("button", { name: "Usuń karteczkę" }));
 
     await waitFor(() => expect(screen.queryByTestId(`rf__node-${a.id}`)).not.toBeInTheDocument());

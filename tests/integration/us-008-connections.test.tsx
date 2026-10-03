@@ -4,7 +4,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { BoardEditorScreen } from "@/components/board/board-editor-screen";
 import { prisma } from "@/lib/db";
 import { apiFetch, installApiFetch } from "../helpers/api-fetch";
-import { getNoteNode } from "../helpers/board";
+import { clickNote, getNoteNode } from "../helpers/board";
 import { resetDb } from "../helpers/db";
 import { mockReactFlow } from "../helpers/react-flow";
 
@@ -16,8 +16,8 @@ describe("TASK-012 US-008 Połączenia mapy myśli", () => {
   async function connectInEditor(sourceId: string, targetId: string) {
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Połącz karteczki" }));
-    await user.click(getNoteNode(sourceId));
-    await user.click(getNoteNode(targetId));
+    await clickNote(sourceId);
+    await clickNote(targetId);
   }
 
   beforeAll(() => {

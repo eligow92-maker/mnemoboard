@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { BoardDetailDto, ConnectionDto, NoteDto } from "@/lib/api-types";
 import { BoardCanvas } from "./board-canvas";
@@ -26,10 +26,16 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [toast, setToast] = useState<string | null>(null);
 
+  // Numer ostatniego wczytania — spóźniona odpowiedź starszego żądania nie nadpisze nowszej.
+  const loadSequence = useRef(0);
+
   const loadBoard = useCallback(async (): Promise<void> => {
+    const sequence = ++loadSequence.current;
     try {
-      setBoard(await api<BoardDetailDto>(`/api/boards/${boardId}`));
+      const loaded = await api<BoardDetailDto>(`/api/boards/${boardId}`);
+      if (sequence === loadSequence.current) setBoard(loaded);
     } catch (error) {
+      if (sequence !== loadSequence.current) return;
       const missing =
         error instanceof ApiClientError && (error.status === 404 || error.status === 400);
       setLoadError(missing ? "Plansza nie istnieje" : errorMessage(error));
@@ -87,22 +93,21 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
     [loadBoard, replaceNote],
   );
 
+  // Numery łańcucha wylicza serwer, więc po zmianie połączeń plansza jest wczytywana ponownie.
   const connect = useCallback(
     async (sourceNoteId: string, targetNoteId: string, kind: ConnectionDto["kind"]) => {
       try {
-        const connection = await api<ConnectionDto>(`/api/boards/${boardId}/connections`, "POST", {
+        await api<ConnectionDto>(`/api/boards/${boardId}/connections`, "POST", {
           sourceNoteId,
           targetNoteId,
           kind,
         });
-        setBoard(
-          (current) => current && { ...current, connections: [...current.connections, connection] },
-        );
+        await loadBoard();
       } catch (error) {
         setToast(errorMessage(error));
       }
     },
-    [boardId],
+    [boardId, loadBoard],
   );
 
   const handleNoteClick = useCallback(
@@ -113,7 +118,8 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
           setMode({ ...mode, sourceId: noteId });
         } else if (mode.sourceId !== noteId) {
           void connect(mode.sourceId, noteId, mode.connection);
-          setMode({ ...mode, sourceId: null });
+          // W łańcuchu wskazana karteczka staje się początkiem następnego ogniwa.
+          setMode({ ...mode, sourceId: mode.connection === "chain" ? noteId : null });
         }
         return;
       }
@@ -133,14 +139,8 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
   async function deleteConnection(connectionId: string): Promise<void> {
     try {
       await api<void>(`/api/connections/${connectionId}`, "DELETE");
-      setBoard(
-        (current) =>
-          current && {
-            ...current,
-            connections: current.connections.filter((connection) => connection.id !== connectionId),
-          },
-      );
       setPanel(null);
+      await loadBoard();
     } catch (error) {
       setToast(errorMessage(error));
     }
@@ -168,18 +168,8 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
 
   async function deleteNote(noteId: string): Promise<void> {
     await api<void>(`/api/notes/${noteId}`, "DELETE");
-    setBoard(
-      (current) =>
-        current && {
-          ...current,
-          notes: current.notes.filter((note) => note.id !== noteId),
-          connections: current.connections.filter(
-            (connection) =>
-              connection.sourceNoteId !== noteId && connection.targetNoteId !== noteId,
-          ),
-        },
-    );
     setPanel(null);
+    await loadBoard();
   }
 
   if (loadError) {

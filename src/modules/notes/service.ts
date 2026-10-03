@@ -1,6 +1,7 @@
 import type { Note } from "@prisma/client";
 import { notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
+import { boardChainPositions } from "@/modules/arrangement/connections";
 import type { NoteCreateInput, NoteUpdateInput } from "./schema";
 
 // Karteczka w kształcie odpowiedzi API: z wyliczanym numerem w łańcuchu.
@@ -37,7 +38,8 @@ export async function updateNote(noteId: string, input: NoteUpdateInput): Promis
     where: { id: noteId },
     data: { topic: input.topic, imageWords: input.imageWords, x: input.x, y: input.y },
   });
-  return toNoteView(note);
+  const positions = await boardChainPositions(note.boardId);
+  return toNoteView(note, positions.get(note.id) ?? null);
 }
 
 // Połączenia i wyniki powtórek karteczki usuwa baza (ON DELETE CASCADE).

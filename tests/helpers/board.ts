@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 
 export { NOTE_HEIGHT, NOTE_WIDTH } from "@/components/board/dimensions";
 
@@ -17,4 +17,10 @@ export function clickPane(container: HTMLElement, x: number, y: number): void {
   const pane = container.querySelector(".react-flow__pane");
   if (!pane) throw new Error("Brak tła planszy");
   fireEvent.click(pane, { clientX: x, clientY: y });
+}
+
+// Dotknięcie karteczki. Samo zdarzenie click — pełna sekwencja wskaźnika uruchamia w jsdom
+// obsługę przeciągania d3-drag, która wymaga prawdziwego okna przeglądarki.
+export async function clickNote(noteId: string): Promise<void> {
+  fireEvent.click(await waitFor(() => getNoteNode(noteId)));
 }

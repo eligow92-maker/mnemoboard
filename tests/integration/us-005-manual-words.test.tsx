@@ -5,7 +5,7 @@ import { BoardEditorScreen } from "@/components/board/board-editor-screen";
 import { prisma } from "@/lib/db";
 import { seedPegWords } from "@/modules/word-images/seed";
 import { installApiFetch } from "../helpers/api-fetch";
-import { clickPane, getNoteNode } from "../helpers/board";
+import { clickNote, clickPane, getNoteNode } from "../helpers/board";
 import { resetDb } from "../helpers/db";
 import { mockReactFlow } from "../helpers/react-flow";
 
@@ -34,7 +34,7 @@ describe("TASK-011 US-005 Ręczne słowa-obrazy", () => {
     });
     render(<BoardEditorScreen boardId={boardId} />);
 
-    await user.click(await waitFor(() => getNoteNode(note.id)));
+    await clickNote(note.id);
     await user.type(await screen.findByLabelText("Słowa-obrazy"), "mity, chondryt");
     await user.click(screen.getByRole("button", { name: "Zapisz" }));
 
@@ -56,7 +56,7 @@ describe("TASK-011 US-005 Ręczne słowa-obrazy", () => {
     });
     render(<BoardEditorScreen boardId={boardId} />);
 
-    await user.click(await waitFor(() => getNoteNode(note.id)));
+    await clickNote(note.id);
     await user.click(await screen.findByRole("button", { name: "Generuj słowa" }));
 
     expect(
@@ -90,7 +90,7 @@ describe("TASK-011 US-005 Ręczne słowa-obrazy", () => {
     });
     render(<BoardEditorScreen boardId={boardId} />);
 
-    await user.click(await waitFor(() => getNoteNode(note.id)));
+    await clickNote(note.id);
     await user.clear(await screen.findByLabelText("Słowa-obrazy"));
     await user.click(screen.getByRole("button", { name: "Zapisz" }));
 

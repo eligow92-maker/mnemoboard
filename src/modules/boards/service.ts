@@ -1,6 +1,7 @@
 import type { Board, Connection, Zone } from "@prisma/client";
 import { notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
+import { chainPositions } from "@/modules/arrangement/chain";
 import { toNoteView, type NoteView } from "@/modules/notes/service";
 import type { BoardInput } from "./schema";
 
@@ -48,5 +49,11 @@ export async function getBoardDetail(boardId: string): Promise<BoardDetail> {
     },
   });
   if (!board) throw notFound("Plansza nie istnieje");
-  return { ...board, notes: board.notes.map((note) => toNoteView(note)) };
+  const positions = chainPositions(
+    board.connections.filter((connection) => connection.kind === "chain"),
+  );
+  return {
+    ...board,
+    notes: board.notes.map((note) => toNoteView(note, positions.get(note.id) ?? null)),
+  };
 }

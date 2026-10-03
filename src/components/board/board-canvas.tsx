@@ -23,6 +23,7 @@ export interface CanvasNote {
   id: string;
   topic: string;
   imageWords: string | null;
+  chainPosition?: number | null;
   x: number;
   y: number;
 }
@@ -61,6 +62,7 @@ function toNode(note: CanvasNote, highlightedNoteId: string | null): NoteFlowNod
     data: {
       topic: note.topic,
       imageWords: note.imageWords,
+      chainPosition: note.chainPosition ?? null,
       highlighted: note.id === highlightedNoteId,
     },
   };
