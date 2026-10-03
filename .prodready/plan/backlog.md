@@ -5,7 +5,7 @@ Statusy: Ready → In Progress → Done. Każde `AC-N` jest numerowane w obrębi
 ## Sprint 1: Fundament i pierwszy przekrój (walking skeleton)
 
 ### TASK-001: Szkielet projektu
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Inicjalizacja Next.js 15 (App Router) z TypeScript strict, Tailwind CSS 4, ESLint, Prettier, Vitest, Testing Library i Playwright; struktura `src/app`, `src/modules`, `src/lib`, `tests/{unit,integration,e2e}`; nagłówek aplikacji z nawigacją.
@@ -15,10 +15,10 @@ AC-1: Given uruchomiona aplikacja, when otwieram stronę główną, then widzę 
 AC-2: Given plik tsconfig.json, when odczytuję opcje kompilatora, then `strict` ma wartość true.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: None
 **Blocks**: TASK-002, TASK-004

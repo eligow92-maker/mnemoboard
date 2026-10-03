@@ -150,8 +150,8 @@ Testy uruchamiane przy każdym pushu i PR:
 
 | Story/Task | AC | Canonical Test File | Canonical Test Name | Red Confirmed |
 |------------|----|---------------------|---------------------|---------------|
-| TASK-001 | AC-1 | tests/integration/app-shell.test.tsx | AC-1: Given uruchomiona aplikacja, when otwieram stronę główną, then widzę nagłówek "Mnemoboard" z linkami "Plansze" i "Lista GSP". | Pending |
-| TASK-001 | AC-2 | tests/integration/app-shell.test.tsx | AC-2: Given plik tsconfig.json, when odczytuję opcje kompilatora, then `strict` ma wartość true. | Pending |
+| TASK-001 | AC-1 | tests/integration/app-shell.test.tsx | AC-1: Given uruchomiona aplikacja, when otwieram stronę główną, then widzę nagłówek "Mnemoboard" z linkami "Plansze" i "Lista GSP". | Yes |
+| TASK-001 | AC-2 | tests/integration/app-shell.test.tsx | AC-2: Given plik tsconfig.json, when odczytuję opcje kompilatora, then `strict` ma wartość true. | Yes |
 | TASK-002 | AC-1 | tests/integration/db-schema.test.ts | AC-1: Given pusta baza, when wykonuję migracje, then istnieją tabele board, zone, note, connection, peg_word, review_session i review_result. | Pending |
 | TASK-002 | AC-2 | tests/integration/db-schema.test.ts | AC-2: Given połączenie karteczek A–B, when zapisuję w bazie drugie połączenie tej samej pary w odwrotnym kierunku, then baza odrzuca zapis błędem unikalności. | Pending |
 | TASK-002 | AC-3 | tests/integration/db-schema.test.ts | AC-3: Given ogniwo łańcucha A→B, when zapisuję w bazie ogniwo łańcucha A→C, then baza odrzuca zapis błędem unikalności. | Pending |

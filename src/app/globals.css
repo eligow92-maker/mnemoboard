@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+/* Tokeny z .prodready/design/ui/tokens.md */
+@theme {
+  --color-primary: #2f6f5e;
+  --color-primary-dark: #24574a;
+  --color-secondary: #c2703d;
+
+  --color-success: #2e7d4f;
+  --color-warning: #b7791f;
+  --color-error: #c0392b;
+  --color-info: #2b6cb0;
+
+  --color-background: #f6f1e7;
+  --color-board: #eadfc8;
+  --color-surface: #fffdf8;
+  --color-text-primary: #2a2622;
+  --color-text-secondary: #6b635a;
+  --color-border: #d9cfbd;
+
+  --color-note: #fff3a6;
+  --color-note-border: #e6d36a;
+  --color-note-selected: #ffe66d;
+  --color-zone-fill: rgb(194 112 61 / 0.1);
+  --color-zone-border: #c2703d;
+  --color-edge-association: #8a8072;
+  --color-edge-chain: #2f6f5e;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-note: 0 2px 4px rgb(42 38 34 / 0.18);
+  --shadow-note-drag: 0 8px 16px rgb(42 38 34 / 0.25);
+}
