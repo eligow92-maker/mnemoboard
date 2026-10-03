@@ -10,6 +10,8 @@ type RouteModule = Partial<Record<string, unknown>>;
 const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
   ["/api/health", () => import("@/app/api/health/route")],
   ["/api/boards", () => import("@/app/api/boards/route")],
+  ["/api/boards/[boardId]", () => import("@/app/api/boards/[boardId]/route")],
+  ["/api/boards/[boardId]/notes", () => import("@/app/api/boards/[boardId]/notes/route")],
 ];
 
 const ORIGIN = "http://localhost:3000";

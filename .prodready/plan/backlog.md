@@ -121,7 +121,7 @@ AC-3: Given formularz nowej planszy, when zatwierdzam pustą nazwę, then plansz
 ---
 
 ### TASK-006: US-003 — Przyklejenie karteczki do planszy
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 `GET /api/boards/{id}`, `POST /api/boards/{id}/notes`; strona edytora planszy łącząca BoardCanvas z API; formularz karteczki (NoteEditor). Zamyka pierwszy przekrój UI → API → baza → UI.
@@ -134,12 +134,12 @@ AC-2: Given formularz karteczki, when zatwierdzam puste zagadnienie, then kartec
 AC-3: Given plansza z dodaną karteczką, when odświeżam stronę, then karteczka ma to samo zagadnienie i to samo położenie.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-004, TASK-005
 **Blocks**: TASK-007, TASK-022

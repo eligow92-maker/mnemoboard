@@ -15,6 +15,21 @@ export class ApiError extends Error {
   }
 }
 
+export function notFound(message: string): ApiError {
+  return new ApiError(404, "NOT_FOUND", message);
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Identyfikator ze ścieżki; zły format to błąd klienta, nie zapytanie do bazy.
+export function uuidParam(params: Record<string, string>, name: string): string {
+  const value = params[name] ?? "";
+  if (!UUID_PATTERN.test(value)) {
+    throw new ApiError(400, "VALIDATION_ERROR", "Niepoprawny identyfikator");
+  }
+  return value;
+}
+
 export interface ApiContext<TBody> {
   request: Request;
   params: Record<string, string>;
