@@ -389,7 +389,7 @@ AC-4: Given strefa zawierająca karteczki, when usuwam strefę, then karteczki p
 ## Sprint 4: Powtórka, statystyki, telefon, dopracowanie
 
 ### TASK-016: Kolejność kart powtórki
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Czysty moduł `review/order`: łańcuchy po kolei (łańcuchy sortowane datą utworzenia pierwszej karteczki), potem pozostałe karteczki według daty utworzenia.
@@ -399,10 +399,10 @@ AC-1: Given plansza z łańcuchem B→C i luźną karteczką A utworzoną najwcz
 AC-2: Given plansza z luźnymi karteczkami utworzonymi w kolejności A, B, C, when wyznaczam kolejność powtórki, then kolejność to A, B, C.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: TASK-013
 **Blocks**: TASK-017
