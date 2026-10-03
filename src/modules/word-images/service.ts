@@ -1,6 +1,8 @@
-import { ApiError } from "@/lib/api";
+import type { PegWord } from "@prisma/client";
+import { ApiError, notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { DEFAULT_PEG_WORDS } from "./default-peg-words";
+import { comparePegNumbers } from "./encoding";
 import { generateWordImages, type GeneratedWordImages } from "./generator";
 
 // Lista GSP z bazy; brakujące hasła (baza bez seeda) uzupełniane słowami startowymi.
@@ -18,4 +20,39 @@ export async function generateForTopic(topic: string): Promise<GeneratedWordImag
     throw new ApiError(422, "NO_DIGITS", "Zagadnienie nie zawiera cyfr");
   }
   return generated;
+}
+
+export interface PegWordView extends PegWord {
+  isCustom: boolean;
+}
+
+function toPegWordView(pegWord: PegWord): PegWordView {
+  return { ...pegWord, isCustom: pegWord.word !== pegWord.defaultWord };
+}
+
+export async function listPegWords(): Promise<PegWordView[]> {
+  const pegWords = await prisma.pegWord.findMany();
+  return pegWords
+    .sort((a, b) => comparePegNumbers(a.number, b.number))
+    .map((pegWord) => toPegWordView(pegWord));
+}
+
+async function requirePegWord(number: string): Promise<PegWord> {
+  const pegWord = /^[0-9]{1,2}$/.test(number)
+    ? await prisma.pegWord.findUnique({ where: { number } })
+    : null;
+  if (!pegWord) throw notFound("Hasło nie istnieje");
+  return pegWord;
+}
+
+export async function updatePegWord(number: string, word: string): Promise<PegWordView> {
+  await requirePegWord(number);
+  return toPegWordView(await prisma.pegWord.update({ where: { number }, data: { word } }));
+}
+
+export async function resetPegWord(number: string): Promise<PegWordView> {
+  const pegWord = await requirePegWord(number);
+  return toPegWordView(
+    await prisma.pegWord.update({ where: { number }, data: { word: pegWord.defaultWord } }),
+  );
 }

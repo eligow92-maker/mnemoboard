@@ -14,6 +14,9 @@ const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
   ["/api/boards/[boardId]/notes", () => import("@/app/api/boards/[boardId]/notes/route")],
   ["/api/notes/[noteId]", () => import("@/app/api/notes/[noteId]/route")],
   ["/api/word-images/generate", () => import("@/app/api/word-images/generate/route")],
+  ["/api/peg-words", () => import("@/app/api/peg-words/route")],
+  ["/api/peg-words/[number]", () => import("@/app/api/peg-words/[number]/route")],
+  ["/api/peg-words/[number]/reset", () => import("@/app/api/peg-words/[number]/reset/route")],
 ];
 
 const ORIGIN = "http://localhost:3000";

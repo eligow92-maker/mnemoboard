@@ -65,3 +65,11 @@ export interface GeneratedWordImagesDto {
   segments: { number: string; word: string }[];
   imageWords: string;
 }
+
+export interface PegWordDto {
+  number: string;
+  word: string;
+  defaultWord: string;
+  isCustom: boolean;
+  updatedAt: string;
+}

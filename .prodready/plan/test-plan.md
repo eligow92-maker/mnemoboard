@@ -172,10 +172,10 @@ Testy uruchamiane przy każdym pushu i PR:
 | TASK-008 | AC-1 | tests/integration/peg-seed.test.ts | AC-1: Given pusta tabela peg_word, when uruchamiam seed, then tabela zawiera 110 haseł z niepustym słowem. | Yes |
 | TASK-008 | AC-2 | tests/unit/peg-seed.test.ts | AC-2: Given startowa lista GSP, when dekoduję spółgłoski każdego słowa według GSP, then wynik jest równy liczbie hasła. | Yes |
 | TASK-008 | AC-3 | tests/integration/peg-seed.test.ts | AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam seed, then hasło "14" nadal ma słowo "tur". | Yes |
-| US-007 / TASK-009 | AC-1 | tests/integration/us-007-peg-words.test.tsx | AC-1: Given świeżo zainstalowana aplikacja, when otwieram listę GSP, then widzę niepuste słowo dla każdego z 110 haseł (0–9 oraz 00–99). | Pending |
-| US-007 / TASK-009 | AC-2 | tests/integration/us-007-peg-words.test.tsx | AC-2: Given lista GSP, when zmieniam słowo dla "14" na "tur", then generowanie dla zagadnienia "14" zwraca "tur". | Pending |
-| US-007 / TASK-009 | AC-3 | tests/integration/us-007-peg-words.test.tsx | AC-3: Given lista GSP, when zapisuję puste słowo dla hasła, then zmiana jest odrzucona i hasło zachowuje poprzednie słowo. | Pending |
-| US-007 / TASK-009 | AC-4 | tests/integration/us-007-peg-words.test.tsx | AC-4: Given hasło ze zmienionym słowem, when używam akcji "Przywróć domyślne", then hasło ma ponownie słowo startowe. | Pending |
+| US-007 / TASK-009 | AC-1 | tests/integration/us-007-peg-words.test.tsx | AC-1: Given świeżo zainstalowana aplikacja, when otwieram listę GSP, then widzę niepuste słowo dla każdego z 110 haseł (0–9 oraz 00–99). | Yes |
+| US-007 / TASK-009 | AC-2 | tests/integration/us-007-peg-words.test.tsx | AC-2: Given lista GSP, when zmieniam słowo dla "14" na "tur", then generowanie dla zagadnienia "14" zwraca "tur". | Yes |
+| US-007 / TASK-009 | AC-3 | tests/integration/us-007-peg-words.test.tsx | AC-3: Given lista GSP, when zapisuję puste słowo dla hasła, then zmiana jest odrzucona i hasło zachowuje poprzednie słowo. | Yes |
+| US-007 / TASK-009 | AC-4 | tests/integration/us-007-peg-words.test.tsx | AC-4: Given hasło ze zmienionym słowem, when używam akcji "Przywróć domyślne", then hasło ma ponownie słowo startowe. | Yes |
 | US-006 / TASK-010 | AC-1 | tests/integration/us-006-generate.test.tsx | AC-1: Given karteczka z zagadnieniem "1410", when używam akcji "Generuj słowa", then otrzymuję kolejno słowo z listy GSP dla "14" i słowo dla "10". | Yes |
 | US-006 / TASK-010 | AC-2 | tests/integration/us-006-generate.test.tsx | AC-2: Given karteczka z zagadnieniem "15.07.1410", when używam akcji "Generuj słowa", then otrzymuję kolejno słowa dla "15", "07", "14" i "10". | Yes |
 | US-006 / TASK-010 | AC-3 | tests/integration/us-006-generate.test.tsx | AC-3: Given karteczka z zagadnieniem "966", when używam akcji "Generuj słowa", then otrzymuję słowo dla "96" i słowo dla pojedynczej cyfry "6". | Yes |

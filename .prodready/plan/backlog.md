@@ -199,7 +199,7 @@ AC-3: Given hasło "14" ze słowem zmienionym na "tur", when ponownie uruchamiam
 ---
 
 ### TASK-009: US-007 — Edytowalna lista słów GSP
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 `GET /api/peg-words`, `PUT /api/peg-words/{number}`, `POST /api/peg-words/{number}/reset`; strona `/peg-words` z edycją w miejscu.
@@ -213,14 +213,14 @@ AC-3: Given lista GSP, when zapisuję puste słowo dla hasła, then zmiana jest 
 AC-4: Given hasło ze zmienionym słowem, when używam akcji "Przywróć domyślne", then hasło ma ponownie słowo startowe.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-003, TASK-008, TASK-010
 **Blocks**: None
