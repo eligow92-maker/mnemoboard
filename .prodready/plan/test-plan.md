@@ -188,9 +188,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-009 / TASK-013 | AC-1 | tests/integration/us-009-chain.test.tsx | AC-1: Given karteczki A, B i C, when tworzę ogniwa łańcucha A→B i B→C, then karteczki pokazują numery kolejności 1, 2 i 3. | Yes |
 | US-009 / TASK-013 | AC-2 | tests/integration/us-009-chain.test.tsx | AC-2: Given karteczka A z ogniwem wychodzącym A→B, when tworzę ogniwo A→C, then ogniwo nie powstaje i widzę komunikat "Karteczka ma już następnik w łańcuchu". | Yes |
 | US-009 / TASK-013 | AC-3 | tests/integration/us-009-chain.test.tsx | AC-3: Given łańcuch A→B→C, when tworzę ogniwo C→A, then ogniwo nie powstaje i widzę komunikat "Łańcuch nie może tworzyć pętli". | Yes |
-| TASK-014 | AC-1 | tests/unit/zones.test.ts | AC-1: Given strefa i karteczka, której środek leży wewnątrz strefy, when wyznaczam strefę karteczki, then wynikiem jest identyfikator tej strefy. | Pending |
-| TASK-014 | AC-2 | tests/unit/zones.test.ts | AC-2: Given dwie nakładające się strefy i karteczka w części wspólnej, when wyznaczam strefę karteczki, then wynikiem jest strefa utworzona później. | Pending |
-| TASK-014 | AC-3 | tests/unit/zones.test.ts | AC-3: Given karteczka przypisana do strefy, when przeliczam przypisania po przesunięciu strefy poza karteczkę, then karteczka nie ma przypisanej strefy. | Pending |
+| TASK-014 | AC-1 | tests/unit/zones.test.ts | AC-1: Given strefa i karteczka, której środek leży wewnątrz strefy, when wyznaczam strefę karteczki, then wynikiem jest identyfikator tej strefy. | Yes |
+| TASK-014 | AC-2 | tests/unit/zones.test.ts | AC-2: Given dwie nakładające się strefy i karteczka w części wspólnej, when wyznaczam strefę karteczki, then wynikiem jest strefa utworzona później. | Yes |
+| TASK-014 | AC-3 | tests/unit/zones.test.ts | AC-3: Given karteczka przypisana do strefy, when przeliczam przypisania po przesunięciu strefy poza karteczkę, then karteczka nie ma przypisanej strefy. | Yes |
 | US-010 / TASK-015 | AC-1 | tests/integration/us-010-zones.test.tsx | AC-1: Given otwarta plansza, when tworzę strefę o nazwie "Kuchnia", then strefa z tą nazwą jest widoczna na planszy. | Pending |
 | US-010 / TASK-015 | AC-2 | tests/integration/us-010-zones.test.tsx | AC-2: Given strefa "Kuchnia", when upuszczam karteczkę w jej obrębie, then karteczka jest przypisana do pokoju "Kuchnia". | Pending |
 | US-010 / TASK-015 | AC-3 | tests/integration/us-010-zones.test.tsx | AC-3: Given karteczka przypisana do pokoju "Kuchnia", when przeciągam ją poza strefę, then karteczka nie jest przypisana do żadnego pokoju. | Pending |

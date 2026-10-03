@@ -334,7 +334,7 @@ AC-3: Given łańcuch A→B→C, when tworzę ogniwo C→A, then ogniwo nie pows
 ---
 
 ### TASK-014: Geometria stref
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Czysty moduł `arrangement/zones`: wyznaczanie strefy dla karteczki ze środka karteczki, rozstrzyganie nakładających się stref, przeliczenie przypisań planszy.
@@ -345,12 +345,12 @@ AC-2: Given dwie nakładające się strefy i karteczka w części wspólnej, whe
 AC-3: Given karteczka przypisana do strefy, when przeliczam przypisania po przesunięciu strefy poza karteczkę, then karteczka nie ma przypisanej strefy.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-002
 **Blocks**: TASK-015
