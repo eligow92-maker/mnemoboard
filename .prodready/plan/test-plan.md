@@ -152,9 +152,9 @@ Testy uruchamiane przy każdym pushu i PR:
 |------------|----|---------------------|---------------------|---------------|
 | TASK-001 | AC-1 | tests/integration/app-shell.test.tsx | AC-1: Given uruchomiona aplikacja, when otwieram stronę główną, then widzę nagłówek "Mnemoboard" z linkami "Plansze" i "Lista GSP". | Yes |
 | TASK-001 | AC-2 | tests/integration/app-shell.test.tsx | AC-2: Given plik tsconfig.json, when odczytuję opcje kompilatora, then `strict` ma wartość true. | Yes |
-| TASK-002 | AC-1 | tests/integration/db-schema.test.ts | AC-1: Given pusta baza, when wykonuję migracje, then istnieją tabele board, zone, note, connection, peg_word, review_session i review_result. | Pending |
-| TASK-002 | AC-2 | tests/integration/db-schema.test.ts | AC-2: Given połączenie karteczek A–B, when zapisuję w bazie drugie połączenie tej samej pary w odwrotnym kierunku, then baza odrzuca zapis błędem unikalności. | Pending |
-| TASK-002 | AC-3 | tests/integration/db-schema.test.ts | AC-3: Given ogniwo łańcucha A→B, when zapisuję w bazie ogniwo łańcucha A→C, then baza odrzuca zapis błędem unikalności. | Pending |
+| TASK-002 | AC-1 | tests/integration/db-schema.test.ts | AC-1: Given pusta baza, when wykonuję migracje, then istnieją tabele board, zone, note, connection, peg_word, review_session i review_result. | Yes |
+| TASK-002 | AC-2 | tests/integration/db-schema.test.ts | AC-2: Given połączenie karteczek A–B, when zapisuję w bazie drugie połączenie tej samej pary w odwrotnym kierunku, then baza odrzuca zapis błędem unikalności. | Yes |
+| TASK-002 | AC-3 | tests/integration/db-schema.test.ts | AC-3: Given ogniwo łańcucha A→B, when zapisuję w bazie ogniwo łańcucha A→C, then baza odrzuca zapis błędem unikalności. | Yes |
 | TASK-003 | AC-1 | tests/integration/api-foundation.test.ts | AC-1: Given działająca baza, when wywołuję GET /api/health, then otrzymuję status 200 i treść `{"status":"ok"}`. | Pending |
 | TASK-003 | AC-2 | tests/integration/api-foundation.test.ts | AC-2: Given endpoint przyjmujący JSON, when wysyłam niepoprawny JSON, then otrzymuję status 400 z kodem `VALIDATION_ERROR`. | Pending |
 | TASK-003 | AC-3 | tests/integration/api-foundation.test.ts | AC-3: Given żądanie POST z nagłówkiem Origin innej witryny, when trafia do API, then otrzymuję status 403 z kodem `FORBIDDEN_ORIGIN`. | Pending |
