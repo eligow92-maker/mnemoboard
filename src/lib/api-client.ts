@@ -15,12 +15,21 @@ export class ApiClientError extends Error {
 const NETWORK_ERROR_MESSAGE = "Brak połączenia z serwerem. Spróbuj ponownie.";
 
 export async function api<T>(path: string, method = "GET", body?: unknown): Promise<T> {
+  return send<T>(path, method, body === undefined ? undefined : JSON.stringify(body));
+}
+
+// Wysyła gotową treść JSON (np. wczytany plik) bez ponownego serializowania.
+export async function apiJsonText<T>(path: string, method: string, text: string): Promise<T> {
+  return send<T>(path, method, text);
+}
+
+async function send<T>(path: string, method: string, body: string | undefined): Promise<T> {
   let response: Response;
   try {
     response = await fetch(path, {
       method,
       headers: body === undefined ? undefined : { "content-type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body,
     });
   } catch {
     throw new ApiClientError(0, "NETWORK_ERROR", NETWORK_ERROR_MESSAGE);

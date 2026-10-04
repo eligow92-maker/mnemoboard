@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { BackupPanel } from "@/components/backup/backup-panel";
 import { Button } from "@/components/ui/button";
 import { api, errorMessage } from "@/lib/api-client";
 import type { BoardDto, BoardSummaryDto, StatsDto } from "@/lib/api-types";
@@ -14,6 +15,14 @@ export function BoardListScreen() {
   const [stats, setStats] = useState<StatsDto | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+
+  const loadBoards = useCallback(async (): Promise<void> => {
+    try {
+      setBoards(await api<BoardSummaryDto[]>("/api/boards"));
+    } catch (error) {
+      setLoadError(errorMessage(error));
+    }
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -109,6 +118,8 @@ export function BoardListScreen() {
           ))}
         </ul>
       )}
+
+      {boards !== null && <BackupPanel onBoardImported={() => void loadBoards()} />}
     </main>
   );
 }

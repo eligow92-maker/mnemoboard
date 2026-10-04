@@ -863,7 +863,7 @@ AC-2: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when ją eksp
 ---
 
 ### TASK-034: US-022 — Import planszy
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 `POST /api/boards/import`: limit 5 MB sprawdzany przed parsowaniem (osobny limit trasy ponad domyślny z `withApi`), walidacja całego pliku, zapis jedną transakcją z nowymi identyfikatorami (`createMany`), dopisek " (import)" przy zajętej nazwie (gdy i ta jest zajęta: " (import 2)", " (import 3)"…), przeliczenie `zoneId` z mapowania identyfikatorów. BackupPanel na liście plansz (także w pustym stanie) z przyciskiem "Importuj planszę" i komunikatami błędów.
@@ -877,14 +877,14 @@ AC-3: Given plik, który nie jest eksportem Mnemoboard, when go importuję, then
 AC-4: Given plik większy niż 5 MB, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik jest za duży (limit 5 MB)".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-033
 **Blocks**: TASK-035
