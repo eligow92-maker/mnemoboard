@@ -37,7 +37,10 @@ function sessionFinished(): ApiError {
 
 // Karty powtórki: tylko karteczki ze słowami-obrazami, najpierw łańcuchy po kolei, potem reszta
 // według daty utworzenia. Kolejność trzyma klient; serwer zapisuje tylko wyniki.
-export async function startSession(boardId: string): Promise<ReviewSessionStart> {
+export async function startSession(
+  boardId: string,
+  colors?: NoteColor[],
+): Promise<ReviewSessionStart> {
   const [notes, chainLinks] = await Promise.all([
     prisma.note.findMany({ where: { boardId }, include: { zone: { select: { name: true } } } }),
     prisma.connection.findMany({
@@ -52,9 +55,11 @@ export async function startSession(boardId: string): Promise<ReviewSessionStart>
     throw new ApiError(422, "NO_REVIEWABLE_NOTES", "Dodaj słowa-obrazy, aby rozpocząć powtórkę");
   }
 
+  // Kolejność liczymy dla wszystkich karteczek, a kolory odfiltrowujemy dopiero potem — dzięki
+  // temu łańcuch przerwany karteczką w innym kolorze zachowuje kolejność.
   const cards = reviewOrder([...reviewable.values()], chainLinks).flatMap((noteId) => {
     const note = reviewable.get(noteId);
-    if (!note) return [];
+    if (!note || (colors && !colors.includes(note.color))) return [];
     return [
       {
         noteId: note.id,
@@ -67,6 +72,10 @@ export async function startSession(boardId: string): Promise<ReviewSessionStart>
       },
     ];
   });
+
+  if (cards.length === 0) {
+    throw new ApiError(422, "NO_NOTES_IN_COLORS", "Brak karteczek w wybranych kolorach");
+  }
 
   const session = await prisma.reviewSession.create({ data: { boardId } });
   return { id: session.id, boardId, startedAt: session.startedAt, cards };

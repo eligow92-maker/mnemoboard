@@ -6,11 +6,13 @@ import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { BoardDetailDto, ConnectionDto, NoteDto, ZoneDto } from "@/lib/api-types";
 import { BoardCanvas } from "./board-canvas";
 import { BoardToolbar, type EditorMode } from "./board-toolbar";
+import { Button } from "@/components/ui/button";
 import { ConnectionPanel } from "./connection-panel";
 import { NOTE_HEIGHT, NOTE_WIDTH, type Position } from "./dimensions";
 import { Toast } from "@/components/ui/toast";
 import { DEFAULT_NOTE_COLOR, type NoteColor } from "@/modules/notes/colors";
 import { NoteEditor, type NoteEditorValues } from "./note-editor";
+import { ReviewStart } from "./review-start";
 import { ZoneEditor } from "./zone-editor";
 import { ZONE_DEFAULT_HEIGHT, ZONE_DEFAULT_WIDTH, type ZoneRect } from "./zone-node";
 
@@ -30,6 +32,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
   const [mode, setMode] = useState<EditorMode>(IDLE);
   const [panel, setPanel] = useState<Panel>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [reviewStartOpen, setReviewStartOpen] = useState(false);
 
   // Numer ostatniego wczytania — spóźniona odpowiedź starszego żądania nie nadpisze nowszej.
   const loadSequence = useRef(0);
@@ -281,13 +284,13 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
       <Toast message={toast} onDismiss={dismissToast} />
       <div className="flex items-center gap-3 border-b border-border bg-surface px-4 py-2">
         <h1 className="min-w-0 flex-1 truncate text-xl font-bold">{board.name}</h1>
-        <Link
-          href={`/boards/${boardId}/review`}
-          className="inline-flex min-h-11 shrink-0 items-center rounded-md bg-primary px-4 font-medium text-white hover:bg-primary-dark"
-        >
+        <Button className="shrink-0" onClick={() => setReviewStartOpen(true)}>
           Rozpocznij powtórkę
-        </Link>
+        </Button>
       </div>
+      {reviewStartOpen && (
+        <ReviewStart boardId={boardId} onCancel={() => setReviewStartOpen(false)} />
+      )}
       <BoardToolbar
         mode={mode}
         onModeChange={(next) => {

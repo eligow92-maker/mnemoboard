@@ -695,7 +695,7 @@ AC-3: Given żółta karteczka, when zmieniam jej kolor na czerwony i odświeża
 ---
 
 ### TASK-028: US-018 — Filtr koloru w powtórce
-**Priority**: P1 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P1 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Opcjonalne `colors` w `POST /api/boards/{id}/review-sessions`: filtr nakładany po wyliczeniu pełnej kolejności kart; błąd 422 `NO_NOTES_IN_COLORS`. Okno ReviewStart z ColorFilter otwierane przyciskiem "Rozpocznij powtórkę" w edytorze planszy; wybór trafia do strony powtórki w parametrze `?colors=`. Wejście na stronę powtórki bez parametru oznacza wszystkie kolory, więc dotychczasowe testy US-011 i US-012 pozostają bez zmian.
@@ -709,14 +709,14 @@ AC-3: Given plansza bez niebieskich karteczek ze słowami-obrazami, when rozpocz
 AC-4: Given łańcuch A→B→C, w którym A i C są czerwone, a B żółta, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then karteczki pojawiają się w kolejności A, C.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-027
 **Blocks**: None

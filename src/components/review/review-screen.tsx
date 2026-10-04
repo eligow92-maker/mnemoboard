@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import type { NoteColor } from "@/modules/notes/colors";
 import { NOTE_COLOR_CLASSES } from "@/components/board/note-colors";
 import { Button } from "@/components/ui/button";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
@@ -81,15 +82,21 @@ function ReviewSummary({ summary, boardId }: { summary: ReviewSummaryDto; boardI
   );
 }
 
-function ReviewUnavailable({ boardId }: { boardId: string }) {
+function ReviewUnavailable({ boardId, inColors }: { boardId: string; inColors: boolean }) {
   return (
     <section
       aria-label="Powtórka niedostępna"
       className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-surface p-6 text-center"
     >
-      <p className="text-lg font-medium">Dodaj słowa-obrazy, aby rozpocząć powtórkę</p>
+      <p className="text-lg font-medium">
+        {inColors
+          ? "Brak karteczek w wybranych kolorach"
+          : "Dodaj słowa-obrazy, aby rozpocząć powtórkę"}
+      </p>
       <p className="text-text-secondary">
-        W powtórce biorą udział tylko karteczki, które mają słowa-obrazy.
+        {inColors
+          ? "Wybierz inne kolory albo wróć do planszy i dodaj słowa-obrazy karteczkom w tych kolorach."
+          : "W powtórce biorą udział tylko karteczki, które mają słowa-obrazy."}
       </p>
       <Link href={`/boards/${boardId}`} className={LINK_BUTTON_CLASS}>
         Wróć do planszy
@@ -99,13 +106,21 @@ function ReviewUnavailable({ boardId }: { boardId: string }) {
 }
 
 // Powtórka: zagadnienie → "Odsłoń" → samoocena → następna karta → podsumowanie.
-export function ReviewScreen({ boardId }: { boardId: string }) {
+export function ReviewScreen({
+  boardId,
+  colors,
+}: {
+  boardId: string;
+  // Zawężenie powtórki do wybranych kolorów; brak = wszystkie.
+  colors?: NoteColor[];
+}) {
   const [session, setSession] = useState<ReviewSessionStartDto | null>(null);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [summary, setSummary] = useState<ReviewSummaryDto | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [unavailable, setUnavailable] = useState(false);
+  const [unavailable, setUnavailable] = useState<string | null>(null);
+  const colorsKey = colors?.join(",") ?? "";
   const [saving, setSaving] = useState(false);
   // Sesję zakładamy raz — także wtedy, gdy React w trybie dev uruchamia efekt dwukrotnie.
   const started = useRef(false);
@@ -113,16 +128,23 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    api<ReviewSessionStartDto>(`/api/boards/${boardId}/review-sessions`, "POST")
+    api<ReviewSessionStartDto>(
+      `/api/boards/${boardId}/review-sessions`,
+      "POST",
+      colorsKey === "" ? undefined : { colors: colorsKey.split(",") },
+    )
       .then(setSession)
       .catch((caught: unknown) => {
-        if (caught instanceof ApiClientError && caught.code === "NO_REVIEWABLE_NOTES") {
-          setUnavailable(true);
+        if (
+          caught instanceof ApiClientError &&
+          (caught.code === "NO_REVIEWABLE_NOTES" || caught.code === "NO_NOTES_IN_COLORS")
+        ) {
+          setUnavailable(caught.code);
         } else {
           setError(errorMessage(caught));
         }
       });
-  }, [boardId]);
+  }, [boardId, colorsKey]);
 
   async function answer(remembered: boolean): Promise<void> {
     if (!session) return;
@@ -166,8 +188,12 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
           {error}
         </p>
       )}
-      {!session && !error && !unavailable && <p className="text-text-secondary">Wczytywanie…</p>}
-      {unavailable && <ReviewUnavailable boardId={boardId} />}
+      {!session && !error && unavailable === null && (
+        <p className="text-text-secondary">Wczytywanie…</p>
+      )}
+      {unavailable !== null && (
+        <ReviewUnavailable boardId={boardId} inColors={unavailable === "NO_NOTES_IN_COLORS"} />
+      )}
 
       {summary && <ReviewSummary summary={summary} boardId={boardId} />}
 
@@ -200,7 +226,7 @@ export function ReviewScreen({ boardId }: { boardId: string }) {
         </>
       )}
 
-      {!summary && !unavailable && (
+      {!summary && unavailable === null && (
         <Link href={`/boards/${boardId}`} className="self-start py-2 text-primary underline">
           Wróć do planszy
         </Link>

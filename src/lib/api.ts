@@ -68,8 +68,11 @@ function assertSameOrigin(request: Request): void {
 async function parseBody<TSchema extends z.ZodTypeAny>(
   request: Request,
   schema: TSchema,
+  optional: boolean,
 ): Promise<z.infer<TSchema>> {
   const contentType = request.headers.get("content-type") ?? "";
+  // Ciało opcjonalne: żądanie bez Content-Type jest poprawne i oznacza brak ciała.
+  if (optional && contentType === "") return schema.parse(undefined);
   if (!contentType.toLowerCase().startsWith("application/json")) {
     throw new ApiError(400, "VALIDATION_ERROR", "Treść żądania musi być w formacie JSON");
   }
@@ -99,13 +102,15 @@ async function parseBody<TSchema extends z.ZodTypeAny>(
 
 // Wspólna warstwa wszystkich handlerów API (ADR-003) — tu później dojdzie kontrola sesji.
 export function withApi<TSchema extends z.ZodTypeAny = z.ZodUndefined>(
-  options: { body?: TSchema },
+  options: { body?: TSchema; bodyOptional?: boolean },
   handler: (context: ApiContext<z.infer<TSchema>>) => Promise<Response>,
 ): (request: Request, context: RouteContext) => Promise<Response> {
   return async (request, context) => {
     try {
       assertSameOrigin(request);
-      const body = options.body ? await parseBody(request, options.body) : undefined;
+      const body = options.body
+        ? await parseBody(request, options.body, options.bodyOptional ?? false)
+        : undefined;
       const params = await context.params;
       return await handler({ request, params, body });
     } catch (error) {
