@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { api, errorMessage } from "@/lib/api-client";
 import type { PegWordDto } from "@/lib/api-types";
+import { comparePegNumbers } from "@/modules/word-images/encoding";
+import { CustomPegSection } from "./custom-peg-section";
 import { PegWordRow } from "./peg-word-row";
 
 export function PegWordsScreen() {
@@ -24,6 +26,25 @@ export function PegWordsScreen() {
       (current) =>
         current?.map((pegWord) => (pegWord.number === updated.number ? updated : pegWord)) ?? null,
     );
+  }
+
+  const builtin = pegWords?.filter((pegWord) => pegWord.kind === "builtin") ?? [];
+  const custom = pegWords?.filter((pegWord) => pegWord.kind === "custom") ?? [];
+
+  function addCustom(entry: PegWordDto): void {
+    setPegWords((current) =>
+      current
+        ? [...current, entry].sort(
+            (a, b) =>
+              Number(a.kind === "custom") - Number(b.kind === "custom") ||
+              comparePegNumbers(a.number, b.number),
+          )
+        : [entry],
+    );
+  }
+
+  function removeCustom(number: string): void {
+    setPegWords((current) => current?.filter((pegWord) => pegWord.number !== number) ?? null);
   }
 
   return (
@@ -50,11 +71,20 @@ export function PegWordsScreen() {
             </tr>
           </thead>
           <tbody>
-            {pegWords.map((pegWord) => (
+            {builtin.map((pegWord) => (
               <PegWordRow key={pegWord.number} pegWord={pegWord} onChange={replacePegWord} />
             ))}
           </tbody>
         </table>
+      )}
+
+      {pegWords !== null && (
+        <CustomPegSection
+          entries={custom}
+          onAdded={addCustom}
+          onChanged={replacePegWord}
+          onRemoved={removeCustom}
+        />
       )}
     </main>
   );

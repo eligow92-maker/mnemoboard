@@ -75,6 +75,7 @@ export interface PegWordDto {
   number: string;
   word: string;
   defaultWord: string | null;
+  kind: "builtin" | "custom";
   isCustom: boolean;
   updatedAt: string;
 }

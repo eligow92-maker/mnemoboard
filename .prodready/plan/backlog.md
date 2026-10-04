@@ -750,7 +750,7 @@ AC-3: Given własny wpis "333" i ciąg cyfr "3331333", when dzielę ciąg na seg
 ---
 
 ### TASK-030: US-019 — Zarządzanie własnymi wpisami GSP
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 `POST /api/peg-words`, `DELETE /api/peg-words/{number}`, rozszerzony `PUT` (własny wpis do 80 znaków), pole `kind` w odpowiedzi, `reset` własnego wpisu → 409 `PEG_NO_DEFAULT`, limit 500 wpisów (`PEG_LIMIT`). Na stronie `/peg-words` sekcja CustomPegSection z formularzem, edycją w miejscu i usuwaniem; tabela 110 haseł wbudowanych pozostaje bez zmian.
@@ -765,16 +765,16 @@ AC-4: Given własny wpis "333" ze słowem "mumia-mysz", when zmieniam słowo na 
 AC-5: Given własny wpis "333", when go usuwam, then wpisu nie ma na liście własnych wpisów.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
-- [ ] Write failing canonical test for AC-5
-- [ ] Implement AC-5 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-5
+- [x] Implement AC-5 (red→green)
 
 **Blocked by**: TASK-024
 **Blocks**: TASK-031, TASK-035
