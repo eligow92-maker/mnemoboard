@@ -274,7 +274,7 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-020 / TASK-031 | AC-1 | tests/integration/us-020-generate-custom.test.tsx | AC-1: Given własny wpis "333" ze słowem "mumia-mysz", when generuję słowa dla zagadnienia "333", then otrzymuję "mumia-mysz". | Yes |
 | US-020 / TASK-031 | AC-2 | tests/integration/us-020-generate-custom.test.tsx | AC-2: Given własny wpis "333", when generuję słowa dla zagadnienia "48333", then otrzymuję kolejno słowo z listy GSP dla "48" i "mumia-mysz". | Yes |
 | US-020 / TASK-031 | AC-3 | tests/integration/us-020-generate-custom.test.tsx | AC-3: Given własne wpisy "333" i "3334", when generuję słowa dla zagadnienia "3334", then otrzymuję słowo wpisu "3334". | Yes |
-| US-020 / TASK-031 | AC-4 | tests/integration/us-020-generate-custom.test.tsx | AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3". | Yes |
+| US-020 / TASK-031 | AC-4 | tests/integration/us-020-generate-custom.test.tsx | AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3". | No — przechodzi od razu (patrz handover) |
 | TASK-032 | AC-1 | tests/unit/transfer-format.test.ts | AC-1: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when serializuję ją do pliku i parsuję ten plik, then wynik zawiera te same 3 karteczki, 1 strefę i 2 połączenia. | Yes |
 | TASK-032 | AC-2 | tests/unit/transfer-format.test.ts | AC-2: Given plik z połączeniem wskazującym karteczkę spoza pliku, when go waliduję, then walidacja zwraca błąd. | Yes |
 | TASK-032 | AC-3 | tests/unit/transfer-format.test.ts | AC-3: Given plik z ogniwami łańcucha A→B, B→C i C→A, when go waliduję, then walidacja zwraca błąd. | Yes |
@@ -294,9 +294,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-023 / TASK-036 | AC-3 | tests/integration/us-023-backup.test.tsx | AC-3: Given istniejąca plansza "Biologia" i plik kopii z 2 planszami, when przywracam kopię, then plansza "Biologia" pozostaje bez zmian, a lista ma 3 plansze. | Yes |
 | US-023 / TASK-036 | AC-4 | tests/integration/us-023-backup.test.tsx | AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then przed zapisem widzę komunikat "Zostaną dodane 2 plansze" i dane zmieniają się dopiero po potwierdzeniu. | Yes |
 | US-023 / TASK-036 | AC-5 | tests/integration/us-023-backup.test.tsx | AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard". | Yes |
-| TASK-037 | AC-1 | tests/integration/transfer-hardening.test.tsx | AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s. | Yes |
-| TASK-037 | AC-2 | tests/integration/transfer-hardening.test.tsx | AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s. | Yes |
-| TASK-037 | AC-3 | tests/integration/transfer-hardening.test.tsx | AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | Yes |
+| TASK-037 | AC-1 | tests/integration/transfer-hardening.test.tsx | AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s. | No — przechodzi od razu (patrz handover) |
+| TASK-037 | AC-2 | tests/integration/transfer-hardening.test.tsx | AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s. | No — przechodzi od razu (patrz handover) |
+| TASK-037 | AC-3 | tests/integration/transfer-hardening.test.tsx | AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | No — przechodzi od razu (patrz handover) |
 
 ## Technical Tests
 
