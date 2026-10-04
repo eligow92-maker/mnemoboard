@@ -104,8 +104,8 @@ describe("TASK-010 US-006 Generowanie słów-obrazów dla liczb", () => {
     expect(generated.status).toBe(200);
     expect(await generated.json()).toEqual({
       segments: [
-        { number: "96", word: words["96"] },
-        { number: "6", word: words["6"] },
+        { number: "96", word: words["96"], source: "builtin" },
+        { number: "6", word: words["6"], source: "builtin" },
       ],
       imageWords: `${words["96"]}, ${words["6"]}`,
     });

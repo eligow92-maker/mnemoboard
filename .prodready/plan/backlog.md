@@ -726,7 +726,7 @@ AC-4: Given łańcuch A→B→C, w którym A i C są czerwone, a B żółta, whe
 ## Sprint 6: Własne wpisy GSP (iteracja 2)
 
 ### TASK-029: Dopasowanie własnych wpisów w generatorze
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Czysta funkcja podziału ciągu cyfr z własnymi wpisami: wyszukanie od lewej, w tym samym miejscu najdłuższy wpis, fragmenty między dopasowaniami dzielone na pary. `generateWordImages` przyjmuje osobno hasła wbudowane i własne oraz zwraca `source` segmentu.
@@ -737,12 +737,12 @@ AC-2: Given własne wpisy "333" i "3334" oraz ciąg cyfr "3334", when dzielę ci
 AC-3: Given własny wpis "333" i ciąg cyfr "3331333", when dzielę ciąg na segmenty, then otrzymuję kolejno "333", "1" i "333".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: None
 **Blocks**: TASK-031

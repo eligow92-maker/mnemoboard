@@ -31,10 +31,10 @@ describe("word-images/generator", () => {
   it("podstawia słowa z listy i łączy je przecinkami", () => {
     expect(generateWordImages("0 i 123456", PEGS)).toEqual({
       segments: [
-        { number: "0", word: "osa" },
-        { number: "12", word: "dynia" },
-        { number: "34", word: "mur" },
-        { number: "56", word: "olej" },
+        { number: "0", word: "osa", source: "builtin" },
+        { number: "12", word: "dynia", source: "builtin" },
+        { number: "34", word: "mur", source: "builtin" },
+        { number: "56", word: "olej", source: "builtin" },
       ],
       imageWords: "osa, dynia, mur, olej",
     });
