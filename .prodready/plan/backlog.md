@@ -892,7 +892,7 @@ AC-4: Given plik większy niż 5 MB, when go importuję, then żadna plansza nie
 ---
 
 ### TASK-035: Przywracanie kopii — reguły scalania
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Serwis przywracania w module `transfer`: każda plansza z kopii dodawana jako nowa z historią powtórek (wyniki przepięte na nowe identyfikatory karteczek); słowo hasła wbudowanego przyjmowane tylko wtedy, gdy bieżące równa się startowemu; własne wpisy tylko brakujące; tryb `dryRun` liczący zmiany bez zapisu; jedna transakcja.
@@ -904,14 +904,14 @@ AC-3: Given istniejący własny wpis "333" ze słowem "mamut" i kopia z wpisem "
 AC-4: Given kopia z planszą mającą ukończoną powtórkę o wyniku 8 z 10, when przywracam kopię, then nowa plansza ma ukończoną powtórkę z 10 wynikami przypisanymi do jej własnych karteczek.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-030, TASK-034
 **Blocks**: TASK-036

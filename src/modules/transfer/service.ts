@@ -1,9 +1,15 @@
 import { randomUUID } from "node:crypto";
-import type { Board, Prisma } from "@prisma/client";
+import type { Board, Prisma, PrismaClient } from "@prisma/client";
 import { ApiError, notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { buildBoardExportFile, exportFileName, parseBoardExportFile } from "./format";
-import { BOARD_FILE_MAX_BYTES, type BoardExportFile } from "./schema";
+import {
+  BOARD_FILE_MAX_BYTES,
+  type BackupBoard,
+  type BackupFile,
+  type BoardExportFile,
+} from "./schema";
+import { CUSTOM_PEG_MAX_COUNT, PEG_WORD_MAX_LENGTH } from "@/modules/word-images/schema";
 
 // Plik eksportu planszy: karteczki, strefy i połączenia, bez historii powtórek.
 export async function exportBoard(boardId: string, now = new Date()) {
@@ -43,7 +49,7 @@ export async function createBoardFromContent(
   tx: Prisma.TransactionClient,
   content: BoardContent,
   taken: ReadonlySet<string>,
-): Promise<Board> {
+): Promise<{ board: Board; noteIds: Map<string, string> }> {
   const board = await tx.board.create({ data: { name: uniqueBoardName(content.name, taken) } });
   const zoneIds = new Map(content.zones.map((zone) => [zone.id, randomUUID()]));
   const noteIds = new Map(content.notes.map((note) => [note.id, randomUUID()]));
@@ -83,7 +89,7 @@ export async function createBoardFromContent(
       kind: connection.kind,
     })),
   });
-  return board;
+  return { board, noteIds };
 }
 
 // Import planszy: zawsze nowa plansza, nic istniejącego nie jest zmieniane.
@@ -93,7 +99,7 @@ export async function importBoard(file: BoardExportFile): Promise<Board> {
       const taken = new Set(
         (await tx.board.findMany({ select: { name: true } })).map((b) => b.name),
       );
-      return createBoardFromContent(tx, file.board, taken);
+      return (await createBoardFromContent(tx, file.board, taken)).board;
     },
     { timeout: 60_000 },
   );
@@ -132,4 +138,119 @@ export async function readBoardExportFile(request: Request): Promise<BoardExport
     throw new ApiError(400, "INVALID_EXPORT_FILE", BOARD_FILE_INVALID_MESSAGE);
   }
   return parsed.data;
+}
+
+export interface RestoreResult {
+  dryRun: boolean;
+  boardsAdded: number;
+  // Hasła wbudowane, które przyjęły słowo z kopii.
+  pegWordsUpdated: number;
+  customPegWordsAdded: number;
+}
+
+interface PegPlan {
+  updates: BackupFile["pegWords"];
+  additions: BackupFile["pegWords"];
+}
+
+// Lista GSP przy przywracaniu tylko dokłada: słowo hasła wbudowanego jest przyjmowane wyłącznie
+// wtedy, gdy użytkownik go nie zmienił; własne wpisy — tylko brakujące.
+async function planPegWords(
+  client: Prisma.TransactionClient | PrismaClient,
+  pegWords: BackupFile["pegWords"],
+): Promise<PegPlan> {
+  const existing = new Map((await client.pegWord.findMany()).map((peg) => [peg.number, peg]));
+  const plan: PegPlan = { updates: [], additions: [] };
+  for (const peg of pegWords) {
+    const current = existing.get(peg.number);
+    if (peg.number.length >= 3) {
+      if (!current) plan.additions.push(peg);
+    } else if (
+      current &&
+      current.defaultWord !== null &&
+      current.word === current.defaultWord &&
+      peg.word !== current.word &&
+      peg.word.length <= PEG_WORD_MAX_LENGTH
+    ) {
+      plan.updates.push(peg);
+    }
+  }
+  const customCount = [...existing.values()].filter((peg) => peg.defaultWord === null).length;
+  if (customCount + plan.additions.length > CUSTOM_PEG_MAX_COUNT) {
+    throw new ApiError(
+      409,
+      "PEG_LIMIT",
+      `Możesz mieć najwyżej ${CUSTOM_PEG_MAX_COUNT} własnych wpisów`,
+    );
+  }
+  return plan;
+}
+
+async function addReviewSessions(
+  tx: Prisma.TransactionClient,
+  boardId: string,
+  noteIds: ReadonlyMap<string, string>,
+  sessions: BackupBoard["reviewSessions"],
+): Promise<void> {
+  const sessionIds = sessions.map(() => randomUUID());
+  await tx.reviewSession.createMany({
+    data: sessions.map((session, index) => ({
+      id: sessionIds[index],
+      boardId,
+      startedAt: new Date(session.startedAt),
+      finishedAt: session.finishedAt === null ? null : new Date(session.finishedAt),
+    })),
+  });
+  await tx.reviewResult.createMany({
+    data: sessions.flatMap((session, index) =>
+      session.results.map((result) => ({
+        sessionId: sessionIds[index],
+        noteId: noteIds.get(result.noteId) ?? "",
+        remembered: result.remembered,
+        answeredAt: new Date(result.answeredAt),
+      })),
+    ),
+  });
+}
+
+// Przywrócenie kopii: tylko dokłada dane (nic istniejącego nie jest zastępowane), w jednej
+// transakcji. Z `dryRun` tylko zlicza, co zostałoby dodane.
+export async function restoreBackup(
+  file: BackupFile,
+  options: { dryRun: boolean },
+): Promise<RestoreResult> {
+  if (options.dryRun) {
+    const plan = await planPegWords(prisma, file.pegWords);
+    return {
+      dryRun: true,
+      boardsAdded: file.boards.length,
+      pegWordsUpdated: plan.updates.length,
+      customPegWordsAdded: plan.additions.length,
+    };
+  }
+
+  return prisma.$transaction(
+    async (tx) => {
+      const plan = await planPegWords(tx, file.pegWords);
+      const taken = new Set(
+        (await tx.board.findMany({ select: { name: true } })).map((b) => b.name),
+      );
+      for (const content of file.boards) {
+        const { board, noteIds } = await createBoardFromContent(tx, content, taken);
+        taken.add(board.name);
+        await addReviewSessions(tx, board.id, noteIds, content.reviewSessions);
+      }
+      for (const peg of plan.updates) {
+        await tx.pegWord.update({ where: { number: peg.number }, data: { word: peg.word } });
+      }
+      await tx.pegWord.createMany({ data: plan.additions });
+      return {
+        dryRun: false,
+        boardsAdded: file.boards.length,
+        pegWordsUpdated: plan.updates.length,
+        customPegWordsAdded: plan.additions.length,
+      };
+    },
+    { timeout: 120_000 },
+  );
 }
