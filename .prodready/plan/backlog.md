@@ -782,7 +782,7 @@ AC-5: Given własny wpis "333", when go usuwam, then wpisu nie ma na liście wł
 ---
 
 ### TASK-031: US-020 — Generator korzysta z własnych wpisów
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 `POST /api/word-images/generate` wczytuje własne wpisy i przekazuje je do generatora z TASK-029; odpowiedź zawiera `source` segmentu. Akcja "Generuj słowa" w NoteEditor działa bez zmian w interfejsie.
@@ -796,14 +796,14 @@ AC-3: Given własne wpisy "333" i "3334", when generuję słowa dla zagadnienia 
 AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-029, TASK-030
 **Blocks**: None

@@ -67,7 +67,7 @@ export interface BoardDetailDto extends BoardDto {
 }
 
 export interface GeneratedWordImagesDto {
-  segments: { number: string; word: string }[];
+  segments: { number: string; word: string; source: "builtin" | "custom" }[];
   imageWords: string;
 }
 

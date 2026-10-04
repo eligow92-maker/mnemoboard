@@ -7,17 +7,23 @@ import { comparePegNumbers } from "./encoding";
 import { generateWordImages, type GeneratedWordImages } from "./generator";
 import { CUSTOM_PEG_MAX_COUNT, PEG_WORD_MAX_LENGTH } from "./schema";
 
-// Lista GSP z bazy; brakujące hasła (baza bez seeda) uzupełniane słowami startowymi.
-async function loadPegWordMap(): Promise<Map<string, string>> {
-  const pegWords = new Map(Object.entries(DEFAULT_PEG_WORDS));
+// Lista GSP z bazy: hasła wbudowane (brakujące, np. w bazie bez seeda, uzupełniane słowami
+// startowymi) oraz własne wpisy użytkownika (bez słowa startowego).
+async function loadPegWordMaps(): Promise<{
+  builtin: Map<string, string>;
+  custom: Map<string, string>;
+}> {
+  const builtin = new Map(Object.entries(DEFAULT_PEG_WORDS));
+  const custom = new Map<string, string>();
   for (const pegWord of await prisma.pegWord.findMany()) {
-    pegWords.set(pegWord.number, pegWord.word);
+    (pegWord.defaultWord === null ? custom : builtin).set(pegWord.number, pegWord.word);
   }
-  return pegWords;
+  return { builtin, custom };
 }
 
 export async function generateForTopic(topic: string): Promise<GeneratedWordImages> {
-  const generated = generateWordImages(topic, await loadPegWordMap());
+  const { builtin, custom } = await loadPegWordMaps();
+  const generated = generateWordImages(topic, builtin, custom);
   if (!generated) {
     throw new ApiError(422, "NO_DIGITS", "Zagadnienie nie zawiera cyfr");
   }
