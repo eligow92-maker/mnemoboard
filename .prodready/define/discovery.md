@@ -75,3 +75,57 @@
 - (nieblokujące) Ostateczna treść startowej listy 110 polskich słów GSP — do przygotowania w fazie Implement; użytkownik może ją edytować.
 - (nieblokujące) Eksport/kopia zapasowa plansz — poza MVP, do rozważenia przed przeniesieniem na VPS.
 - (nieblokujące) Model kont i logowania dla przyszłej wersji publicznej.
+
+---
+
+# Iteracja 2 (rozszerzenie po MVP) — 2026-10-04
+
+- Status: completed
+- Stop option offered: yes
+- Initial request: "Chciałbym rozszerzyć aplikację o nowe funkcjonalności i małe upgrade'y: Pole dodatkowe zapamiętywania (np. zdanie lub opowiadanie) obok słowa-obrazy i zagadnienie i pole na obraz lub emotki, dodajmy też kilka kolorów (które mogą oznaczać ważność). dodatkowo chcę Eksport, import i kopie zapasowe plansz. Przydałoby się rozszerzenie GŚP do 999 (przydatne będzie zwłaszcza dla numerów telefonów) lub opcja dodania cyfry samemu, np. użytkownik podaje 333 i podaje mumia-mysz"
+
+## Known Facts
+- Stan wyjścia: wszystkie 23 zadania backlogu MVP mają status Done; faza Build nierozpoczęta.
+- Karteczka dostaje dodatkowe pole zapamiętywania (zdanie lub opowiadanie) obok zagadnienia i słów-obrazów.
+- Karteczka dostaje pole na obraz lub emotki.
+- Karteczki mają mieć kilka kolorów, które mogą oznaczać ważność.
+- Eksport, import i kopie zapasowe plansz wchodzą do zakresu (dotąd "poza MVP").
+- GSP: własne wpisy użytkownika (dowolny ciąg cyfr → własne słowo/fraza) zamiast wbudowanej listy 000–999.
+- Generator najpierw dopasowuje najdłuższy własny wpis, resztę ciągu dzieli na pary jak dotąd.
+- Pole graficzne karteczki: w tej iteracji tylko emotki; wgrywanie plików graficznych odłożone na później.
+- Emotki muszą być czytelne na karteczce na planszy — nie muszą być duże, ale ma być widać, co przedstawiają.
+- Kopie zapasowe: w tej iteracji ręczne — pobranie jednego pliku ze wszystkimi danymi i przywrócenie z pliku; osobno eksport/import pojedynczej planszy. Kopie automatyczne odłożone na później.
+- Wczytywanie plików ma być bezpieczne: import planszy zawsze dodaje nową planszę i niczego nie nadpisuje. Przywrócenie pełnej kopii działa tak samo — dokłada dane, nie zastępuje istniejących (interpretacja agenta odpowiedzi 4, do potwierdzenia przez użytkownika).
+- Kolor karteczki: oznaczenie wizualne (znaczenie nadaje użytkownik) plus filtr koloru przy rozpoczynaniu powtórki. Bez statystyk per kolor.
+
+## Questions and Answers
+1. Q: Czy wystarczą własne wpisy GSP (dowolny ciąg cyfr → własne słowo lub fraza, generator dopasowuje najdłuższy wpis, reszta dzielona na pary), czy potrzebna jest wbudowana lista 1000 słów 000–999 z podziałem na trójki?
+   A: Własne wpisy.
+2. Q: Czy na karteczce wystarczą emotki, czy mają być też wgrywane własne pliki graficzne?
+   A: Emotki najpierw, obrazy później; ważne, żeby były widoczne (nie muszą być duże, ale ma być widać, co to jest).
+3. Q: Czy kopia zapasowa ma się robić automatycznie na serwerze, czy wystarczy ręczne pobranie pliku i przywrócenie z pliku?
+   A: Ręcznie starczy na początku.
+4. Q: Co ma się stać z istniejącymi danymi przy wczytywaniu pliku — import planszy dodaje nową planszę, a przywrócenie pełnej kopii zastępuje wszystko, czy kopia ma być scalana bez nadpisywania?
+   A: "import planszy myślę bezpieczniejszy" — odczytane jako: wczytywanie ma tylko dodawać, bez zastępowania istniejących danych.
+5. Q: Czy kolor karteczki ma być tylko oznaczeniem wizualnym, czy aplikacja ma go też używać jako ważności (filtr w powtórce, statystyki per kolor)?
+   A: Wizualny + filtr koloru.
+6. Q: (pytanie otwarte z bramki Define) Czy karteczka z samym opowiadaniem, bez słów-obrazów, ma wchodzić do powtórki?
+   A: Nie wchodzi.
+
+## Assumptions
+- B-1: Dodatkowe pole nazywa się "Opowiadanie", jest opcjonalne, ma do 2000 znaków; na karteczce na planszy widoczne są jego pierwsze 2 wiersze, całość w edycji i w powtórce.
+- B-2: W powtórce opowiadanie i emotki są częścią skojarzenia — zakryte i odsłaniane razem ze słowami-obrazami. Reguła zakresu powtórki się nie zmienia: karteczka wchodzi do powtórki tylko wtedy, gdy ma słowa-obrazy (samo opowiadanie nie wystarcza) — regułę zakresu potwierdził użytkownik w odpowiedzi 6.
+- B-3: Pole emotek mieści do 8 emotek (znaków graficznych); użytkownik wpisuje je klawiaturą emotek systemu — aplikacja nie ma własnego wybieraka. Na planszy przy powiększeniu 100% emotki mają co najmniej 24 px.
+- B-4: Paleta ma 5 kolorów: żółty (domyślny, także dla istniejących karteczek), czerwony, pomarańczowy, zielony, niebieski.
+- B-5: Filtr koloru jest wybierany przy rozpoczynaniu powtórki; domyślnie zaznaczone są wszystkie kolory. Sesja z filtrem liczy się w statystykach jak każda inna, a wybór filtra nie jest zapamiętywany.
+- B-6: Własny wpis GSP to ciąg 3–15 cyfr ze słowem lub frazą do 80 znaków; hasła 1–2-cyfrowe pozostają na wbudowanej liście 110 haseł. Własny wpis można zmienić i usunąć.
+- B-7: Generator w każdym ciągu cyfr wyszukuje własne wpisy od lewej; przy kilku pasujących w tym samym miejscu wygrywa najdłuższy. Fragmenty przed, między i za dopasowaniami są dzielone na pary jak dotąd (np. własny wpis 333: "48333" → 48 + 333).
+- B-8: Eksport planszy to jeden plik JSON z karteczkami, strefami i połączeniami, bez historii powtórek. Pełna kopia to jeden plik JSON ze wszystkimi planszami, historią powtórek i listą GSP.
+- B-9: Import planszy tworzy nową planszę; przy zajętej nazwie dostaje ona dopisek " (import)". Wczytanie tego samego pliku dwa razy tworzy dwie plansze.
+- B-10: Przywrócenie pełnej kopii tylko dokłada: każda plansza z pliku wchodzi jako nowa (z historią powtórek); słowo GSP z kopii trafia do hasła tylko wtedy, gdy użytkownik nie zmienił tego hasła; własne wpisy — tylko brakujące. Przed przywróceniem aplikacja pokazuje liczbę plansz do dodania i czeka na potwierdzenie.
+- B-11: Wczytywany plik jest sprawdzany w całości przed zapisem — błędny plik niczego nie zmienia. Limity: 5 MB dla planszy, 50 MB dla pełnej kopii.
+- B-12: Mierniki sukcesu produktu się nie zmieniają; miernikiem tej iteracji jest wierność kopii: plansza po eksporcie i imporcie ma te same karteczki, strefy i połączenia.
+
+## Open Questions
+- (nieblokujące) Wgrywanie plików graficznych na karteczki — odłożone; zmieni format eksportu (obrazy obok JSON).
+- (nieblokujące) Automatyczne kopie zapasowe na serwerze — odłożone.

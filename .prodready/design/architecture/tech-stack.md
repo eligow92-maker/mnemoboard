@@ -64,6 +64,10 @@ Wybór użytkownika (faza Design): **Next.js + TypeScript**, PostgreSQL + Prisma
 }
 ```
 
+## Iteracja 2
+
+Bez nowych zależności: pliki eksportu i kopii to JSON walidowany przez Zod (ADR-005), emotki liczy wbudowany `Intl.Segmenter` (ADR-006), kolory karteczek to tokeny Tailwind. Zmiana schematu (pola `story`, `emoji`, `color`; własne wpisy w `peg_word`) idzie nową migracją Prisma z ręcznie dopisanym ograniczeniem CHECK, jak w ADR-002.
+
 ## Authentication
 
 - Strategy: brak w MVP — aplikacja dostępna wyłącznie w sieci lokalnej (ADR-003).

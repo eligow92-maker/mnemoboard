@@ -27,6 +27,9 @@ MVP nie ma kont, więc brak encji User. Wszystkie dane należą do jedynego uży
 - zoneId: UUID? (FK → Zone, przy usunięciu strefy → NULL)
 - topic: String (1–500 znaków, wymagane) — zagadnienie do zapamiętania
 - imageWords: String? (do 500 znaków) — słowa-obrazy; puste = karteczka pomijana w powtórce
+- story: String? (do 2000 znaków) — opowiadanie; w powtórce zakryte razem ze słowami-obrazami
+- emoji: String? (do 8 emotek, czyli znaków graficznych) — w powtórce zakryte razem ze słowami-obrazami
+- color: Enum (`yellow` — domyślny, `red`, `orange`, `green`, `blue`)
 - x: Float
 - y: Float
 - createdAt: DateTime
@@ -47,10 +50,15 @@ Reguły:
 - Numer kolejności w łańcuchu nie jest przechowywany — wynika z przejścia po ogniwach.
 
 ### PegWord (hasło listy GSP)
-- number: String (klucz główny; "0"–"9" oraz "00"–"99", łącznie 110 haseł)
-- word: String (1–40 znaków, wymagane) — aktualne słowo użytkownika
-- defaultWord: String (1–40 znaków) — słowo startowe, niezmienne
+- number: String (klucz główny; 1–15 cyfr)
+- word: String (1–80 znaków, wymagane) — aktualne słowo lub fraza użytkownika
+- defaultWord: String? (1–40 znaków) — słowo startowe, niezmienne; NULL = własny wpis
 - updatedAt: DateTime
+
+Reguły:
+- Hasła wbudowane: "0"–"9" oraz "00"–"99" (110 haseł), zawsze z defaultWord; nie można ich usunąć ani dodać.
+- Własne wpisy: 3–15 cyfr, defaultWord = NULL; można je dodawać, zmieniać i usuwać; najwyżej 500.
+- Generator: w ciągu cyfr szuka własnych wpisów od lewej, w tym samym miejscu wybiera najdłuższy; pozostałe fragmenty dzieli na pary.
 
 ### ReviewSession (sesja powtórki)
 - id: UUID
@@ -64,6 +72,19 @@ Reguły:
 - noteId: UUID (FK → Note, kaskadowe usuwanie)
 - remembered: Boolean
 - answeredAt: DateTime
+
+## Pliki eksportu i kopii
+
+Pliki nie są encjami — aplikacja ich nie przechowuje. Oba to JSON z polami `format: "mnemoboard"`, `version: 1`, `kind` i `exportedAt`.
+
+- `kind: "board"` — eksport planszy: `board` (name), `notes`, `zones`, `connections`. Bez historii powtórek.
+- `kind: "backup"` — pełna kopia: `boards` (każda jak wyżej oraz `reviewSessions` z `results`), `pegWords` (hasła wbudowane o słowie innym niż startowe oraz wszystkie własne wpisy).
+
+Reguły wczytywania:
+- Identyfikatory z pliku służą tylko do odtworzenia powiązań; wczytane rekordy dostają nowe identyfikatory.
+- Import planszy zawsze tworzy nową planszę; przy zajętej nazwie dopisuje " (import)".
+- Przywrócenie kopii dodaje każdą planszę jako nową; słowo hasła wbudowanego jest wczytywane tylko wtedy, gdy bieżące słowo równa się startowemu; własne wpisy — tylko brakujące.
+- Plik jest walidowany w całości przed zapisem, a zapis odbywa się w jednej transakcji.
 
 ## Relationships
 - Board 1:N Zone

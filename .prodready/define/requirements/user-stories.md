@@ -1,6 +1,6 @@
 # User Stories
 
-Jedyny typ użytkownika w MVP: **uczący się** (właściciel aplikacji, bez logowania).
+Jedyny typ użytkownika: **uczący się** (właściciel aplikacji, bez logowania). Epiki 1–6 to MVP, epiki 7–9 to iteracja 2.
 
 ## Epic 1: Plansze
 
@@ -222,6 +222,155 @@ AC-3: Given plansza bez żadnej ukończonej powtórki, when otwieram listę plan
 AC-1: Given ekran o szerokości 375 px, when przechodzę powtórkę, then wszystkie elementy powtórki mieszczą się na ekranie bez przewijania w poziomie.
 AC-2: Given plansza otwarta na urządzeniu dotykowym, when przeciągam karteczkę palcem, then karteczka zmienia położenie.
 AC-3: Given karteczka dodana na jednym urządzeniu, when otwieram tę planszę na drugim urządzeniu, then widzę tę karteczkę.
+
+**Priority**: P0
+**Estimate**: L
+
+---
+
+## Epic 7: Bogatsze karteczki (iteracja 2)
+
+### US-015: Opowiadanie na karteczce
+**As a** uczący się
+**I want to** dopisać do karteczki zdanie lub opowiadanie
+**So that** łączę słowa-obrazy w historyjkę, którą łatwiej odtworzyć
+
+**Acceptance Criteria**:
+AC-1: Given karteczka z zagadnieniem "1410" i słowami-obrazami "tor, dos", when wpisuję opowiadanie "Po torze jedzie dos" i odświeżam stronę, then karteczka pokazuje to opowiadanie pod słowami-obrazami.
+AC-2: Given karteczka w powtórce mająca opowiadanie, when widzę jej zagadnienie przed odsłonięciem, then opowiadanie jest zakryte.
+AC-3: Given karteczka w powtórce mająca opowiadanie, when wybieram "Odsłoń", then widzę opowiadanie obok słów-obrazów.
+AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 znaków, then zmiana jest odrzucona i widzę komunikat "Opowiadanie może mieć najwyżej 2000 znaków".
+
+**Priority**: P0
+**Estimate**: S
+
+---
+
+### US-016: Emotki na karteczce
+**As a** uczący się
+**I want to** dodać do karteczki emotki
+**So that** obraz skojarzenia widzę na planszy od razu, bez czytania
+
+**Acceptance Criteria**:
+AC-1: Given karteczka na planszy, when wpisuję emotki "🏰⚔️" i odświeżam stronę, then karteczka pokazuje emotki "🏰⚔️".
+AC-2: Given karteczka z emotkami na planszy przy powiększeniu 100%, when odczytuję rozmiar czcionki emotek, then wynosi on co najmniej 24 px.
+AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzucona i widzę komunikat "Najwyżej 8 emotek".
+AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte.
+
+**Priority**: P0
+**Estimate**: S
+
+---
+
+### US-017: Kolory karteczek
+**As a** uczący się
+**I want to** nadać karteczce jeden z kilku kolorów
+**So that** oznaczam, co jest najważniejsze
+
+**Acceptance Criteria**:
+AC-1: Given otwarta plansza, when dodaję nową karteczkę, then karteczka ma kolor żółty.
+AC-2: Given karteczka na planszy, when otwieram wybór koloru, then widzę dokładnie 5 kolorów: żółty, czerwony, pomarańczowy, zielony i niebieski.
+AC-3: Given żółta karteczka, when zmieniam jej kolor na czerwony i odświeżam stronę, then karteczka jest czerwona.
+
+**Priority**: P0
+**Estimate**: S
+
+---
+
+### US-018: Filtr koloru w powtórce
+**As a** uczący się
+**I want to** ograniczyć powtórkę do karteczek w wybranych kolorach
+**So that** powtarzam najpierw to, co oznaczyłem jako ważne
+
+**Acceptance Criteria**:
+AC-1: Given plansza z karteczkami czerwonymi i żółtymi mającymi słowa-obrazy, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then w powtórce pojawiają się wyłącznie czerwone karteczki.
+AC-2: Given plansza z karteczkami w różnych kolorach, when otwieram rozpoczęcie powtórki, then wszystkie kolory są zaznaczone.
+AC-3: Given plansza bez niebieskich karteczek ze słowami-obrazami, when rozpoczynam powtórkę z zaznaczonym tylko kolorem niebieskim, then powtórka się nie rozpoczyna i widzę komunikat "Brak karteczek w wybranych kolorach".
+AC-4: Given łańcuch A→B→C, w którym A i C są czerwone, a B żółta, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then karteczki pojawiają się w kolejności A, C.
+
+**Priority**: P1
+**Estimate**: M
+
+---
+
+## Epic 8: Własne wpisy GSP (iteracja 2)
+
+### US-019: Zarządzanie własnymi wpisami GSP
+**As a** uczący się
+**I want to** dodawać własne wpisy dla dłuższych ciągów cyfr
+**So that** mam gotowe skojarzenia dla liczb, których nie obejmuje lista 00–99
+
+**Acceptance Criteria**:
+AC-1: Given lista GSP, when dodaję własny wpis "333" ze słowem "mumia-mysz", then wpis "333 – mumia-mysz" jest widoczny na liście własnych wpisów.
+AC-2: Given istniejący własny wpis "333", when dodaję kolejny wpis "333", then wpis nie powstaje i widzę komunikat "Wpis dla tej liczby już istnieje".
+AC-3: Given formularz własnego wpisu, when zatwierdzam liczbę "33", then wpis nie powstaje i widzę komunikat "Własny wpis musi mieć od 3 do 15 cyfr".
+AC-4: Given własny wpis "333" ze słowem "mumia-mysz", when zmieniam słowo na "mamut", then wpis pokazuje "333 – mamut".
+AC-5: Given własny wpis "333", when go usuwam, then wpisu nie ma na liście własnych wpisów.
+
+**Priority**: P0
+**Estimate**: M
+
+---
+
+### US-020: Generator korzysta z własnych wpisów
+**As a** uczący się
+**I want to** aby generator używał moich własnych wpisów przed podziałem na pary
+**So that** dla numerów telefonów dostaję moje gotowe skojarzenia
+
+**Acceptance Criteria**:
+AC-1: Given własny wpis "333" ze słowem "mumia-mysz", when generuję słowa dla zagadnienia "333", then otrzymuję "mumia-mysz".
+AC-2: Given własny wpis "333", when generuję słowa dla zagadnienia "48333", then otrzymuję kolejno słowo z listy GSP dla "48" i "mumia-mysz".
+AC-3: Given własne wpisy "333" i "3334", when generuję słowa dla zagadnienia "3334", then otrzymuję słowo wpisu "3334".
+AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3".
+
+**Priority**: P0
+**Estimate**: M
+
+---
+
+## Epic 9: Eksport, import i kopie zapasowe (iteracja 2)
+
+### US-021: Eksport planszy
+**As a** uczący się
+**I want to** pobrać planszę jako plik
+**So that** mam jej kopię poza serwerem i mogę ją przenieść
+
+**Acceptance Criteria**:
+AC-1: Given plansza "Historia Polski", when wybieram "Eksportuj", then przeglądarka pobiera plik JSON, którego nazwa zawiera "historia-polski".
+AC-2: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when ją eksportuję, then plik zawiera 3 karteczki z zagadnieniem, słowami-obrazami, opowiadaniem, emotkami, kolorem i położeniem, 1 strefę i 2 połączenia.
+
+**Priority**: P0
+**Estimate**: M
+
+---
+
+### US-022: Import planszy
+**As a** uczący się
+**I want to** wczytać planszę z pliku
+**So that** odzyskuję lub przenoszę planszę bez ryzyka dla istniejących danych
+
+**Acceptance Criteria**:
+AC-1: Given plik eksportu planszy z 3 karteczkami, 1 strefą i łańcuchem A→B→C, when go importuję, then powstaje nowa plansza z 3 karteczkami, 1 strefą i łańcuchem w kolejności A, B, C.
+AC-2: Given istniejąca plansza "Historia" i plik eksportu planszy o nazwie "Historia", when importuję plik, then istniejąca plansza pozostaje bez zmian, a nowa nazywa się "Historia (import)".
+AC-3: Given plik, który nie jest eksportem Mnemoboard, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik nie jest poprawnym eksportem Mnemoboard".
+AC-4: Given plik większy niż 5 MB, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik jest za duży (limit 5 MB)".
+
+**Priority**: P0
+**Estimate**: M
+
+---
+
+### US-023: Pełna kopia zapasowa
+**As a** uczący się
+**I want to** pobrać jedną kopię wszystkich danych i móc ją przywrócić
+**So that** awaria dysku serwera nie oznacza utraty plansz
+
+**Acceptance Criteria**:
+AC-1: Given 2 plansze, zmienione słowo GSP dla "14" i własny wpis "333", when wybieram "Pobierz kopię", then pobrany plik zawiera 2 plansze z historią powtórek, słowo dla "14" i wpis "333".
+AC-2: Given świeża instalacja bez plansz i plik kopii z 2 planszami, zmienionym słowem dla "14" i wpisem "333", when przywracam kopię, then mam 2 plansze z wynikami ostatnich powtórek, zmienione słowo dla "14" i wpis "333".
+AC-3: Given istniejąca plansza "Biologia" i plik kopii z 2 planszami, when przywracam kopię, then plansza "Biologia" pozostaje bez zmian, a lista ma 3 plansze.
+AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then przed zapisem widzę komunikat "Zostaną dodane 2 plansze" i dane zmieniają się dopiero po potwierdzeniu.
+AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard".
 
 **Priority**: P0
 **Estimate**: L

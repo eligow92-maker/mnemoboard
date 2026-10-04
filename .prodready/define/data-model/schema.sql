@@ -1,7 +1,8 @@
--- Mnemoboard — schemat danych MVP (dialekt PostgreSQL).
+-- Mnemoboard — schemat danych MVP + iteracja 2 (dialekt PostgreSQL).
 -- ORM i baza zostaną wybrane w fazie Design; ten plik jest źródłem prawdy dla encji z entities.md.
 
 CREATE TYPE connection_kind AS ENUM ('association', 'chain');
+CREATE TYPE note_color AS ENUM ('yellow', 'red', 'orange', 'green', 'blue');
 
 CREATE TABLE board (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -30,6 +31,10 @@ CREATE TABLE note (
     zone_id     UUID             REFERENCES zone (id) ON DELETE SET NULL,
     topic       VARCHAR(500)     NOT NULL CHECK (length(trim(topic)) > 0),
     image_words VARCHAR(500),
+    story       VARCHAR(2000),
+    -- Do 8 emotek; liczbę znaków graficznych waliduje aplikacja.
+    emoji       VARCHAR(64),
+    color       note_color       NOT NULL DEFAULT 'yellow',
     x           DOUBLE PRECISION NOT NULL,
     y           DOUBLE PRECISION NOT NULL,
     created_at  TIMESTAMPTZ      NOT NULL DEFAULT now(),
@@ -58,10 +63,12 @@ CREATE UNIQUE INDEX connection_chain_source_uniq ON connection (source_note_id) 
 CREATE UNIQUE INDEX connection_chain_target_uniq ON connection (target_note_id) WHERE kind = 'chain';
 
 CREATE TABLE peg_word (
-    number       VARCHAR(2)  PRIMARY KEY CHECK (number ~ '^[0-9]{1,2}$'),
-    word         VARCHAR(40) NOT NULL CHECK (length(trim(word)) > 0),
-    default_word VARCHAR(40) NOT NULL CHECK (length(trim(default_word)) > 0),
-    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    number       VARCHAR(15) PRIMARY KEY CHECK (number ~ '^[0-9]{1,15}$'),
+    word         VARCHAR(80) NOT NULL CHECK (length(trim(word)) > 0),
+    -- NULL = własny wpis użytkownika (3–15 cyfr); hasła wbudowane (1–2 cyfry) zawsze mają słowo startowe.
+    default_word VARCHAR(40) CHECK (default_word IS NULL OR length(trim(default_word)) > 0),
+    updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CHECK ((default_word IS NULL) = (length(number) >= 3))
 );
 
 CREATE TABLE review_session (

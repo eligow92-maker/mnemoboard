@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Mnemoboard API
-  version: 1.0.0
+  version: 1.1.0
   description: >
     API aplikacji Mnemoboard — plansze z karteczkami, słowa-obrazy według
     Głównego Systemu Pamięciowego, układanie (mapa myśli, łańcuch, pokoje)
@@ -31,6 +31,8 @@ tags:
     description: Generator słów-obrazów i lista GSP
   - name: review
     description: Powtórki i statystyki
+  - name: transfer
+    description: Eksport, import i kopie zapasowe (iteracja 2)
   - name: system
     description: Stan aplikacji
 
@@ -135,6 +137,121 @@ paths:
           description: Plansza usunięta
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /boards/{boardId}/export:
+    parameters:
+      - $ref: '#/components/parameters/BoardId'
+    get:
+      tags: [transfer]
+      summary: Eksport planszy do pliku JSON (US-021)
+      description: >
+        Zwraca plik z karteczkami, strefami i połączeniami, bez historii
+        powtórek. Nagłówek `Content-Disposition: attachment` z nazwą
+        `mnemoboard-<nazwa-planszy>-<RRRR-MM-DD>.json`, gdzie nazwa planszy jest
+        zapisana małymi literami, bez polskich znaków, z myślnikami.
+      operationId: exportBoard
+      responses:
+        '200':
+          description: Plik eksportu
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: attachment; filename="mnemoboard-historia-polski-2026-10-04.json"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoardExportFile'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /boards/import:
+    post:
+      tags: [transfer]
+      summary: Import planszy z pliku eksportu (US-022)
+      description: >
+        Zawsze tworzy nową planszę z nowymi identyfikatorami; przy zajętej
+        nazwie dopisuje " (import)". Plik jest walidowany w całości przed
+        zapisem, a zapis odbywa się w jednej transakcji. Błędy: 400
+        `INVALID_EXPORT_FILE` ("Plik nie jest poprawnym eksportem Mnemoboard"),
+        413 `FILE_TOO_LARGE` ("Plik jest za duży (limit 5 MB)").
+      operationId: importBoard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardExportFile'
+      responses:
+        '201':
+          description: Nowa plansza utworzona z pliku
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Board'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+
+  /backup:
+    get:
+      tags: [transfer]
+      summary: Pobranie pełnej kopii zapasowej (US-023)
+      description: >
+        Jeden plik ze wszystkimi planszami, historią powtórek i listą GSP
+        (hasła wbudowane o zmienionym słowie oraz wszystkie własne wpisy).
+        Nagłówek `Content-Disposition: attachment` z nazwą
+        `mnemoboard-kopia-<RRRR-MM-DD>.json`.
+      operationId: downloadBackup
+      responses:
+        '200':
+          description: Plik kopii
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupFile'
+
+  /backup/restore:
+    post:
+      tags: [transfer]
+      summary: Przywrócenie pełnej kopii — tylko dokłada dane (US-023)
+      description: >
+        Z `dryRun=true` plik jest tylko walidowany, a odpowiedź podaje, co
+        zostałoby dodane (podstawa komunikatu "Zostaną dodane N plansze").
+        Bez `dryRun` każda plansza z pliku jest dodawana jako nowa razem z
+        historią powtórek; słowo hasła wbudowanego jest wczytywane tylko wtedy,
+        gdy bieżące słowo równa się startowemu; własne wpisy — tylko brakujące.
+        Całość w jednej transakcji. Błędy: 400 `INVALID_BACKUP_FILE` ("Plik nie
+        jest poprawną kopią Mnemoboard"), 413 `FILE_TOO_LARGE` (limit 50 MB).
+      operationId: restoreBackup
+      parameters:
+        - name: dryRun
+          in: query
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupFile'
+      responses:
+        '200':
+          description: Wynik przywrócenia (lub jego zapowiedź przy dryRun)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
 
   /boards/{boardId}/notes:
     parameters:
@@ -308,10 +425,12 @@ paths:
   /word-images/generate:
     post:
       tags: [word-images]
-      summary: Wygenerowanie słów-obrazów dla liczb w zagadnieniu (US-005, US-006)
+      summary: Wygenerowanie słów-obrazów dla liczb w zagadnieniu (US-005, US-006, US-020)
       description: >
-        Wyszukuje ciągi cyfr, dzieli każdy na pary od lewej (ostatnia pojedyncza
-        cyfra osobno) i podstawia słowa z listy GSP. Nie zapisuje niczego —
+        Wyszukuje ciągi cyfr. W każdym ciągu szuka własnych wpisów GSP od lewej
+        (w tym samym miejscu wygrywa najdłuższy); fragmenty przed, między i za
+        dopasowaniami dzieli na pary od lewej (ostatnia pojedyncza cyfra osobno)
+        i podstawia słowa z listy GSP (US-020). Nie zapisuje niczego —
         klient decyduje o zastąpieniu istniejących słów-obrazów karteczki.
         Błąd 422 z kodem `NO_DIGITS`, gdy zagadnienie nie zawiera cyfr.
       operationId: generateWordImages
@@ -342,24 +461,61 @@ paths:
   /peg-words:
     get:
       tags: [word-images]
-      summary: Lista 110 haseł GSP (US-007)
+      summary: Lista haseł GSP — 110 wbudowanych i własne wpisy (US-007, US-019)
       operationId: listPegWords
       responses:
         '200':
-          description: Hasła posortowane — najpierw 0–9, potem 00–99
+          description: >
+            Hasła posortowane — najpierw wbudowane 0–9, potem 00–99, na końcu
+            własne wpisy według długości i wartości
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/PegWord'
+    post:
+      tags: [word-images]
+      summary: Dodanie własnego wpisu GSP (US-019)
+      description: >
+        Błędy: 400 z błędem pola "Własny wpis musi mieć od 3 do 15 cyfr";
+        409 `PEG_EXISTS` ("Wpis dla tej liczby już istnieje");
+        409 `PEG_LIMIT` po przekroczeniu 500 własnych wpisów.
+      operationId: createPegWord
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: string
+                  pattern: '^[0-9]{3,15}$'
+                word:
+                  type: string
+                  minLength: 1
+                  maxLength: 80
+              required: [number, word]
+      responses:
+        '201':
+          description: Własny wpis utworzony
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PegWord'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /peg-words/{number}:
     parameters:
       - $ref: '#/components/parameters/PegNumber'
     put:
       tags: [word-images]
-      summary: Zmiana słowa dla hasła (US-007)
+      summary: Zmiana słowa dla hasła wbudowanego lub własnego wpisu (US-007, US-019)
+      description: Hasło wbudowane przyjmuje do 40 znaków, własny wpis do 80.
       operationId: updatePegWord
       requestBody:
         required: true
@@ -371,7 +527,7 @@ paths:
                 word:
                   type: string
                   minLength: 1
-                  maxLength: 40
+                  maxLength: 80
               required: [word]
       responses:
         '200':
@@ -384,6 +540,18 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [word-images]
+      summary: Usunięcie własnego wpisu GSP (US-019)
+      description: Błąd 409 `PEG_BUILTIN` przy próbie usunięcia hasła wbudowanego.
+      operationId: deletePegWord
+      responses:
+        '204':
+          description: Wpis usunięty
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /peg-words/{number}/reset:
     parameters:
@@ -391,6 +559,7 @@ paths:
     post:
       tags: [word-images]
       summary: Przywrócenie słowa domyślnego (US-007)
+      description: Błąd 409 `PEG_NO_DEFAULT` dla własnego wpisu (nie ma słowa startowego).
       operationId: resetPegWord
       responses:
         '200':
@@ -401,19 +570,38 @@ paths:
                 $ref: '#/components/schemas/PegWord'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /boards/{boardId}/review-sessions:
     parameters:
       - $ref: '#/components/parameters/BoardId'
     post:
       tags: [review]
-      summary: Rozpoczęcie powtórki planszy (US-011, US-012)
+      summary: Rozpoczęcie powtórki planszy (US-011, US-012, US-018)
       description: >
         Zwraca karty w kolejności powtórki: najpierw łańcuchy po kolei, potem
         pozostałe karteczki według daty utworzenia. Karteczki bez słów-obrazów
         są pomijane. Błąd 422 z kodem `NO_REVIEWABLE_NOTES`, gdy żadna karteczka
-        nie ma słów-obrazów.
+        nie ma słów-obrazów. Opcjonalne `colors` zawęża powtórkę do karteczek w
+        wybranych kolorach z zachowaniem kolejności; brak ciała lub pola oznacza
+        wszystkie kolory. Błąd 422 `NO_NOTES_IN_COLORS` ("Brak karteczek w
+        wybranych kolorach"), gdy plansza ma karteczki do powtórki, ale żadnej
+        w wybranych kolorach.
       operationId: startReviewSession
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                colors:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: '#/components/schemas/NoteColor'
       responses:
         '201':
           description: Sesja rozpoczęta
@@ -421,6 +609,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReviewSessionStart'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -536,10 +726,10 @@ components:
       name: number
       in: path
       required: true
-      description: Hasło GSP — "0"–"9" lub "00"–"99"
+      description: Hasło GSP — wbudowane "0"–"9" i "00"–"99" lub własny wpis (3–15 cyfr)
       schema:
         type: string
-        pattern: '^[0-9]{1,2}$'
+        pattern: '^[0-9]{1,15}$'
 
   schemas:
     Board:
@@ -637,6 +827,12 @@ components:
           type: string
         imageWords:
           type: [string, 'null']
+        story:
+          type: [string, 'null']
+        emoji:
+          type: [string, 'null']
+        color:
+          $ref: '#/components/schemas/NoteColor'
         x:
           type: number
         y:
@@ -651,7 +847,13 @@ components:
         updatedAt:
           type: string
           format: date-time
-      required: [id, boardId, zoneId, topic, imageWords, x, y, chainPosition, createdAt, updatedAt]
+      required: [id, boardId, zoneId, topic, imageWords, story, emoji, color, x, y, chainPosition, createdAt, updatedAt]
+
+    NoteColor:
+      type: string
+      enum: [yellow, red, orange, green, blue]
+      default: yellow
+      description: Kolor karteczki (US-017); znaczenie nadaje użytkownik
 
     NoteCreate:
       type: object
@@ -663,6 +865,16 @@ components:
         imageWords:
           type: [string, 'null']
           maxLength: 500
+        story:
+          type: [string, 'null']
+          maxLength: 2000
+          description: Opowiadanie (US-015)
+        emoji:
+          type: [string, 'null']
+          maxLength: 64
+          description: Do 8 emotek liczonych jako znaki graficzne (US-016); więcej → 400 z błędem pola "Najwyżej 8 emotek"
+        color:
+          $ref: '#/components/schemas/NoteColor'
         x:
           type: number
         y:
@@ -680,6 +892,16 @@ components:
         imageWords:
           type: [string, 'null']
           maxLength: 500
+        story:
+          type: [string, 'null']
+          maxLength: 2000
+          description: Opowiadanie (US-015)
+        emoji:
+          type: [string, 'null']
+          maxLength: 64
+          description: Do 8 emotek liczonych jako znaki graficzne (US-016); więcej → 400 z błędem pola "Najwyżej 8 emotek"
+        color:
+          $ref: '#/components/schemas/NoteColor'
         x:
           type: number
         y:
@@ -815,10 +1037,14 @@ components:
             properties:
               number:
                 type: string
-                pattern: '^[0-9]{1,2}$'
+                pattern: '^[0-9]{1,15}$'
               word:
                 type: string
-            required: [number, word]
+              source:
+                type: string
+                enum: [builtin, custom]
+                description: custom — dopasowany własny wpis; builtin — hasło z listy 110
+            required: [number, word, source]
         imageWords:
           type: string
           description: Słowa połączone przecinkami, gotowe do wpisania w karteczkę
@@ -829,17 +1055,25 @@ components:
       properties:
         number:
           type: string
-          pattern: '^[0-9]{1,2}$'
+          pattern: '^[0-9]{1,15}$'
         word:
           type: string
         defaultWord:
+          type: [string, 'null']
+          description: Słowo startowe hasła wbudowanego; null dla własnego wpisu
+        kind:
           type: string
+          enum: [builtin, custom]
+          description: builtin — jedno ze 110 haseł; custom — własny wpis użytkownika (3–15 cyfr)
         isCustom:
           type: boolean
+          description: >
+            Znacznik z MVP: słowo hasła wbudowanego różni się od startowego.
+            Dla własnych wpisów zawsze true. Rodzaj hasła określa `kind`.
         updatedAt:
           type: string
           format: date-time
-      required: [number, word, defaultWord, isCustom, updatedAt]
+      required: [number, word, defaultWord, kind, isCustom, updatedAt]
 
     ReviewCard:
       type: object
@@ -856,7 +1090,15 @@ components:
         zoneName:
           type: [string, 'null']
           description: Nazwa pokoju, odsłaniana razem ze słowami-obrazami
-      required: [noteId, topic, imageWords, zoneName]
+        story:
+          type: [string, 'null']
+          description: Opowiadanie, odsłaniane razem ze słowami-obrazami (US-015)
+        emoji:
+          type: [string, 'null']
+          description: Emotki, odsłaniane razem ze słowami-obrazami (US-016)
+        color:
+          $ref: '#/components/schemas/NoteColor'
+      required: [noteId, topic, imageWords, zoneName, story, emoji, color]
 
     ReviewSessionStart:
       type: object
@@ -925,6 +1167,212 @@ components:
           minimum: 0
       required: [sessionsLast7Days]
 
+    ExportNote:
+      type: object
+      description: Karteczka w pliku; `id` służy tylko do odtworzenia powiązań
+      properties:
+        id:
+          type: string
+          format: uuid
+        zoneId:
+          type: [string, 'null']
+          format: uuid
+        topic:
+          type: string
+          minLength: 1
+          maxLength: 500
+        imageWords:
+          type: [string, 'null']
+          maxLength: 500
+        story:
+          type: [string, 'null']
+          maxLength: 2000
+        emoji:
+          type: [string, 'null']
+          maxLength: 64
+        color:
+          $ref: '#/components/schemas/NoteColor'
+        x:
+          type: number
+        y:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, zoneId, topic, imageWords, story, emoji, color, x, y, createdAt]
+
+    ExportZone:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        x:
+          type: number
+        y:
+          type: number
+        width:
+          type: number
+          exclusiveMinimum: 0
+        height:
+          type: number
+          exclusiveMinimum: 0
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, x, y, width, height, createdAt]
+
+    ExportConnection:
+      type: object
+      properties:
+        sourceNoteId:
+          type: string
+          format: uuid
+        targetNoteId:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ConnectionKind'
+      required: [sourceNoteId, targetNoteId, kind]
+
+    ExportBoard:
+      type: object
+      description: >
+        Zawartość planszy. Połączenia muszą wskazywać karteczki z tego pliku i
+        spełniać reguły domenowe (jedno połączenie na parę, łańcuch bez pętli,
+        jeden następnik i poprzednik) — inaczej plik jest odrzucany.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        createdAt:
+          type: string
+          format: date-time
+        notes:
+          type: array
+          maxItems: 2000
+          items:
+            $ref: '#/components/schemas/ExportNote'
+        zones:
+          type: array
+          maxItems: 200
+          items:
+            $ref: '#/components/schemas/ExportZone'
+        connections:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportConnection'
+      required: [name, createdAt, notes, zones, connections]
+
+    BoardExportFile:
+      type: object
+      properties:
+        format:
+          type: string
+          enum: [mnemoboard]
+        version:
+          type: integer
+          enum: [1]
+        kind:
+          type: string
+          enum: [board]
+        exportedAt:
+          type: string
+          format: date-time
+        board:
+          $ref: '#/components/schemas/ExportBoard'
+      required: [format, version, kind, exportedAt, board]
+
+    ExportReviewSession:
+      type: object
+      properties:
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: [string, 'null']
+          format: date-time
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              noteId:
+                type: string
+                format: uuid
+              remembered:
+                type: boolean
+              answeredAt:
+                type: string
+                format: date-time
+            required: [noteId, remembered, answeredAt]
+      required: [startedAt, finishedAt, results]
+
+    BackupFile:
+      type: object
+      properties:
+        format:
+          type: string
+          enum: [mnemoboard]
+        version:
+          type: integer
+          enum: [1]
+        kind:
+          type: string
+          enum: [backup]
+        exportedAt:
+          type: string
+          format: date-time
+        boards:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ExportBoard'
+              - type: object
+                properties:
+                  reviewSessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExportReviewSession'
+                required: [reviewSessions]
+        pegWords:
+          type: array
+          description: Hasła wbudowane o słowie innym niż startowe oraz wszystkie własne wpisy
+          items:
+            type: object
+            properties:
+              number:
+                type: string
+                pattern: '^[0-9]{1,15}$'
+              word:
+                type: string
+                minLength: 1
+                maxLength: 80
+            required: [number, word]
+      required: [format, version, kind, exportedAt, boards, pegWords]
+
+    RestoreResult:
+      type: object
+      properties:
+        dryRun:
+          type: boolean
+        boardsAdded:
+          type: integer
+          minimum: 0
+        pegWordsUpdated:
+          type: integer
+          minimum: 0
+          description: Hasła wbudowane, które przyjęły słowo z kopii
+        customPegWordsAdded:
+          type: integer
+          minimum: 0
+      required: [dryRun, boardsAdded, pegWordsUpdated, customPegWordsAdded]
+
     Error:
       type: object
       properties:
@@ -968,6 +1416,12 @@ components:
             $ref: '#/components/schemas/Error'
     Unprocessable:
       description: Żądanie poprawne, ale niewykonalne w bieżącym stanie
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PayloadTooLarge:
+      description: Plik przekracza limit rozmiaru
       content:
         application/json:
           schema:

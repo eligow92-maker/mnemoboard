@@ -7,9 +7,14 @@
 - Jedna plansza i jeden typ karteczki dla wszystkich trzech technik (mapa myśli, łańcuch, pałac) — bez osobnych modułów na technikę.
 - Każdy wynik powtórki jest zapisywany z datą, aby dało się policzyć mierniki sukcesu.
 - Dane użytkownika nie giną: każda zmiana na planszy jest utrwalana na serwerze.
+- Wczytanie pliku (import planszy, przywrócenie kopii) nigdy nie zmienia ani nie usuwa istniejących plansz; błędny plik nie zmienia niczego.
+- Własny wpis GSP ma pierwszeństwo przed podziałem na pary.
 
 ## Explicit Non-Goals
 - Generowanie grafik/obrazków (AI lub inne).
+- Wgrywanie plików graficznych na karteczki (w iteracji 2 tylko emotki).
+- Automatyczne kopie zapasowe i przywracanie kopii z zastąpieniem danych.
+- Wbudowana lista GSP 000–999; statystyki skuteczności per kolor.
 - Automatyczne skojarzenia dla treści nieliczbowych (brak modelu językowego).
 - Powtórki rozłożone w czasie (SRS) i przypomnienia.
 - Konta, rejestracja, logowanie i wielu użytkowników w MVP.
@@ -24,6 +29,7 @@
 - Stack technologiczny do wyboru w fazie Design (brak preferencji użytkownika).
 - Generator liczb oparty na polskim Głównym Systemie Pamięciowym: 0=s/z, 1=t/d, 2=n, 3=m, 4=r, 5=l, 6=j, 7=k/g, 8=f/w, 9=p/b.
 - Architektura nie może blokować późniejszego dodania logowania i przeniesienia na VPS.
+- Pliki eksportu i kopii to JSON z numerem wersji formatu; aplikacja nie przechowuje ich na serwerze.
 
 ## Timeline & Resources
 - Timeline: bez twardego terminu; priorytetem jest jakość.

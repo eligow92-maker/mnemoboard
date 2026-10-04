@@ -16,12 +16,14 @@
 - Obsłużyć trzy techniki jednym edytorem: połączenia, uporządkowany łańcuch, nazwane pokoje.
 - Pozwolić sprawdzić zapamiętanie i mierzyć je w czasie.
 - Udostępnić te same dane na komputerze i telefonie.
+- Iteracja 2: wzbogacić karteczkę (opowiadanie, emotki, kolor), dać własne wpisy GSP dla dłuższych liczb i zabezpieczyć dane eksportem, importem oraz ręczną kopią zapasową.
 
 ### Non-Goals
 - Generowanie grafik oraz jakiekolwiek użycie AI/LLM.
 - Powtórki rozłożone w czasie (SRS) i przypomnienia.
 - Konta, logowanie, wielu użytkowników, wystawienie do internetu.
 - Akronimy, rymowanki, współdzielenie plansz, edycja równoczesna, aplikacje natywne.
+- Wgrywanie plików graficznych, automatyczne kopie zapasowe, przywracanie z zastąpieniem danych, wbudowana lista GSP 000–999, statystyki per kolor.
 
 ## 3. User Personas
 
@@ -64,10 +66,27 @@
 - Interfejs responsywny od 375 px szerokości, przeciąganie dotykiem, wspólne dane na serwerze.
 - **Acceptance**: US-014.
 
+### FR-7: Bogatsze karteczki (iteracja 2)
+- Karteczka ma opcjonalne opowiadanie (do 2000 znaków), emotki (do 8, co najmniej 24 px na planszy) i jeden z 5 kolorów (domyślnie żółty).
+- W powtórce opowiadanie i emotki są zakryte i odsłaniane razem ze słowami-obrazami; do powtórki nadal wchodzą tylko karteczki ze słowami-obrazami.
+- Przy rozpoczynaniu powtórki można zawęzić ją do wybranych kolorów; kolejność łańcucha jest zachowana.
+- **Acceptance**: US-015, US-016, US-017, US-018.
+
+### FR-8: Własne wpisy GSP (iteracja 2)
+- Użytkownik dodaje, zmienia i usuwa własne wpisy: ciąg 3–15 cyfr → słowo lub fraza (np. 333 → "mumia-mysz").
+- Generator szuka własnych wpisów od lewej (najdłuższy wygrywa), a pozostałe fragmenty dzieli na pary jak dotąd.
+- **Acceptance**: "48333" → słowo dla 48 i "mumia-mysz" (US-019, US-020).
+
+### FR-9: Eksport, import i kopie zapasowe (iteracja 2)
+- Eksport planszy do pliku JSON i import, który zawsze tworzy nową planszę.
+- Pełna kopia: jeden plik ze wszystkimi planszami, historią powtórek i listą GSP; przywrócenie tylko dokłada dane, po potwierdzeniu.
+- Błędny lub zbyt duży plik jest odrzucany w całości.
+- **Acceptance**: US-021, US-022, US-023.
+
 ## 5. Non-Functional Requirements
 
-- **Performance**: plansza z 200 karteczkami otwiera się w < 2 s w sieci lokalnej; zapis zmiany < 500 ms.
-- **Security**: brak uwierzytelniania w MVP — wyłącznie sieć lokalna; walidacja wejścia po stronie serwera, ochrona przed XSS, zapytania parametryzowane, sekrety w zmiennych środowiskowych.
+- **Performance**: plansza z 200 karteczkami otwiera się w < 2 s w sieci lokalnej; zapis zmiany < 500 ms; eksport i import planszy < 2 s; pełna kopia 50 plansz < 10 s.
+- **Security**: brak uwierzytelniania w MVP — wyłącznie sieć lokalna; walidacja wejścia po stronie serwera, ochrona przed XSS, zapytania parametryzowane, sekrety w zmiennych środowiskowych; wczytywane pliki są niezaufanym wejściem (limit 5 MB / 50 MB, pełna walidacja, jedna transakcja).
 - **Availability**: Docker Compose na domowym serwerze/komputerze; działa bez dostępu do internetu; brak wymagań SLA.
 - **Budget**: 0 zł; tylko darmowe i otwarte narzędzia.
 
@@ -75,10 +94,10 @@
 
 ### Entities
 - **Board**: plansza — nazwa.
-- **Note**: karteczka — zagadnienie, słowa-obrazy, położenie, opcjonalny pokój.
+- **Note**: karteczka — zagadnienie, słowa-obrazy, opowiadanie, emotki, kolor, położenie, opcjonalny pokój.
 - **Zone**: strefa-pokój — nazwa, położenie i rozmiar.
 - **Connection**: połączenie dwóch karteczek — rodzaj `association` lub `chain`.
-- **PegWord**: hasło listy GSP — liczba, słowo aktualne, słowo startowe.
+- **PegWord**: hasło listy GSP — liczba, słowo aktualne, słowo startowe (brak = własny wpis 3–15 cyfr).
 - **ReviewSession**: sesja powtórki planszy — początek i koniec.
 - **ReviewResult**: wynik jednej karteczki w sesji — pamiętał / nie pamiętał, data.
 
@@ -91,7 +110,8 @@
 ## 7. Scope & Timeline
 
 - **MVP Features**: plansze; karteczki; generator GSP z edytowalną listą; połączenia, łańcuch, pokoje; powtórka z samooceną; statystyki; obsługa telefonu.
-- **Future Features**: SRS; konta i VPS; akronimy/rymowanki; podpowiedzi AI i grafiki; eksport/kopie zapasowe; współdzielenie.
+- **Iteracja 2**: opowiadanie, emotki i kolory karteczek; filtr koloru w powtórce; własne wpisy GSP; eksport i import planszy; ręczna pełna kopia.
+- **Future Features**: SRS; konta i VPS; akronimy/rymowanki; podpowiedzi AI i grafiki; wgrywanie obrazów; automatyczne kopie; współdzielenie.
 - **Timeline**: bez twardego terminu, jakość ponad datę.
 - **Team**: jedna osoba, po godzinach.
 
@@ -100,8 +120,8 @@
 - Startowa lista 110 polskich słów GSP wymaga ręcznego przygotowania; jej jakość decyduje o użyteczności generatora.
 - Edytor planszy z przeciąganiem, połączeniami i strefami na dotyku to największe ryzyko techniczne MVP.
 - Brak logowania jest bezpieczny tylko w sieci lokalnej; przeniesienie na VPS wymaga wcześniej uwierzytelniania i HTTPS.
-- Brak kopii zapasowych w MVP — utrata dysku serwera oznacza utratę plansz.
-- Pozostałe założenia (A-2…A-12) spisano w `discovery.md`.
+- Kopia zapasowa jest ręczna — chroni tylko wtedy, gdy użytkownik ją pobiera; dwukrotne przywrócenie tej samej kopii dubluje plansze.
+- Pozostałe założenia (A-2…A-12, B-1…B-12) spisano w `discovery.md`.
 
 ## 9. References
 
