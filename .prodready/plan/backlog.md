@@ -587,7 +587,7 @@ AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wy
 ## Sprint 5: Bogatsze karteczki (iteracja 2)
 
 ### TASK-024: Migracja schematu iteracji 2
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Migracja Prisma: enum `note_color`, kolumny `note.story`, `note.emoji`, `note.color` (domyślnie `yellow`, także dla istniejących karteczek); `peg_word.number` do 15 znaków, `word` do 80, `default_word` dopuszcza NULL; ręcznie dopisane ograniczenie CHECK wiążące brak słowa startowego z długością liczby ≥ 3 (jak w ADR-002). Aktualizacja `schema.prisma` i typów.
@@ -598,12 +598,12 @@ AC-2: Given tabela peg_word, when zapisuję hasło "333" bez słowa startowego, 
 AC-3: Given tabela peg_word, when zapisuję hasło "33" bez słowa startowego, then baza odrzuca zapis błędem ograniczenia CHECK.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: None
 **Blocks**: TASK-025, TASK-026, TASK-027, TASK-030

@@ -18,6 +18,16 @@ enum ConnectionKind {
   @@map("connection_kind")
 }
 
+enum NoteColor {
+  yellow
+  red
+  orange
+  green
+  blue
+
+  @@map("note_color")
+}
+
 model Board {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String   @db.VarChar(100)
@@ -51,15 +61,18 @@ model Zone {
 }
 
 model Note {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  boardId    String   @map("board_id") @db.Uuid
-  zoneId     String?  @map("zone_id") @db.Uuid
-  topic      String   @db.VarChar(500)
-  imageWords String?  @map("image_words") @db.VarChar(500)
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  boardId    String    @map("board_id") @db.Uuid
+  zoneId     String?   @map("zone_id") @db.Uuid
+  topic      String    @db.VarChar(500)
+  imageWords String?   @map("image_words") @db.VarChar(500)
+  story      String?   @db.VarChar(2000)
+  emoji      String?   @db.VarChar(64)
+  color      NoteColor @default(yellow)
   x          Float
   y          Float
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   board               Board          @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   zone                Zone?          @relation(fields: [zoneId], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -89,9 +102,9 @@ model Connection {
 }
 
 model PegWord {
-  number      String   @id @db.VarChar(2)
-  word        String   @db.VarChar(40)
-  defaultWord String   @map("default_word") @db.VarChar(40)
+  number      String   @id @db.VarChar(15)
+  word        String   @db.VarChar(80)
+  defaultWord String?  @map("default_word") @db.VarChar(40)
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   @@map("peg_word")

@@ -69,7 +69,7 @@ export interface GeneratedWordImagesDto {
 export interface PegWordDto {
   number: string;
   word: string;
-  defaultWord: string;
+  defaultWord: string | null;
   isCustom: boolean;
   updatedAt: string;
 }

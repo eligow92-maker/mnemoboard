@@ -52,6 +52,10 @@ export async function updatePegWord(number: string, word: string): Promise<PegWo
 
 export async function resetPegWord(number: string): Promise<PegWordView> {
   const pegWord = await requirePegWord(number);
+  // Własne wpisy (bez słowa startowego) obsłuży TASK-030; hasła 0–9 i 00–99 zawsze je mają.
+  if (pegWord.defaultWord === null) {
+    throw new ApiError(409, "PEG_NO_DEFAULT", "Własny wpis nie ma słowa domyślnego");
+  }
   return toPegWordView(
     await prisma.pegWord.update({ where: { number }, data: { word: pegWord.defaultWord } }),
   );
