@@ -41,7 +41,7 @@
 - [ ] ZoneEditor (nazwa pokoju, usuń)
 
 ## Review
-- [ ] ReviewStart (przed pierwszą kartą: ColorFilter + "Rozpocznij"; komunikat "Brak karteczek w wybranych kolorach")
+- [ ] ReviewStart (okno w edytorze planszy otwierane przyciskiem "Rozpocznij powtórkę": ColorFilter + "Rozpocznij"; wybór trafia do strony powtórki w parametrze `colors`; komunikat "Brak karteczek w wybranych kolorach")
 - [ ] ColorFilter (5 próbek ColorSwatch, wybór wielokrotny, domyślnie wszystkie zaznaczone)
 - [ ] ReviewCard (zagadnienie widoczne; słowa-obrazy, opowiadanie, emotki i nazwa pokoju zakryte do "Odsłoń"; pasek w kolorze karteczki)
 - [ ] ReviewActions ("Odsłoń" → "Pamiętałem" / "Nie pamiętałem")

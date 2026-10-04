@@ -33,7 +33,10 @@ Testy kanoniczne są celowo w większości integracyjne, bo kryteria opisują za
 | word-images | podział na pary cyfr, kodowanie/dekodowanie GSP, zagadnienia bez cyfr, wiele ciągów cyfr |
 | arrangement/chain | następnik, poprzednik, wykrywanie pętli, numeracja, wiele łańcuchów |
 | arrangement/zones | środek karteczki w strefie, strefy nakładające się, krawędzie stref |
-| review/order | łańcuchy przed luźnymi, pomijanie karteczek bez słów-obrazów, procent z zaokrągleniem |
+| review/order | łańcuchy przed luźnymi, pomijanie karteczek bez słów-obrazów, procent z zaokrągleniem; filtr koloru zachowujący kolejność |
+| word-images (iteracja 2) | dopasowanie własnych wpisów: od lewej, najdłuższy wygrywa, pary w przerwach |
+| notes (iteracja 2) | liczenie emotek jako znaków graficznych (flagi, odcienie skóry, sekwencje ZWJ) |
+| transfer (iteracja 2) | schemat pliku, wersja i rodzaj, walidacja powiązań, nazwa pliku |
 
 **Framework**: Vitest
 **Location**: `tests/unit/`
@@ -94,6 +97,26 @@ Testy kanoniczne są celowo w większości integracyjne, bo kryteria opisują za
 - [ ] POST /api/review-sessions/:id/finish - podsumowanie
 - [ ] GET /api/stats - sesje z 7 dni, nieukończone pominięte
 
+### Iteracja 2 — karteczki i powtórka
+- [ ] POST/PATCH karteczki - story, emoji, color; story > 2000 → 400; 9 emotek → 400; nieznany kolor → 400
+- [ ] POST /api/boards/:id/review-sessions - colors zawęża karty z zachowaniem kolejności
+- [ ] POST /api/boards/:id/review-sessions - brak kart w kolorach → 422 NO_NOTES_IN_COLORS
+
+### Iteracja 2 — własne wpisy GSP
+- [ ] POST /api/peg-words - sukces; duplikat → 409 PEG_EXISTS; "33" → 400
+- [ ] PUT /api/peg-words/:number - własny wpis
+- [ ] DELETE /api/peg-words/:number - własny wpis; hasło wbudowane → 409 PEG_BUILTIN
+- [ ] POST /api/peg-words/:number/reset - własny wpis → 409 PEG_NO_DEFAULT
+- [ ] POST /api/word-images/generate - "333", "48333", "3334" z własnymi wpisami
+
+### Iteracja 2 — eksport, import, kopia
+- [ ] GET /api/boards/:id/export - plik i nagłówek Content-Disposition
+- [ ] POST /api/boards/import - nowa plansza; zajęta nazwa → " (import)"
+- [ ] POST /api/boards/import - zły plik → 400 INVALID_EXPORT_FILE; > 5 MB → 413 FILE_TOO_LARGE
+- [ ] GET /api/backup - wszystkie plansze, historia powtórek, lista GSP
+- [ ] POST /api/backup/restore?dryRun=true - liczby bez zapisu
+- [ ] POST /api/backup/restore - tylko dokłada; zły plik → 400 INVALID_BACKUP_FILE
+
 ### System
 - [ ] GET /api/health - ok / 503
 - [ ] Obcy Origin → 403
@@ -119,6 +142,8 @@ Mapowane z `.prodready/define/test-scenarios/*.feature`:
 - [ ] Przeciąganie karteczki dotykiem (multi-device.feature, US-014)
 - [ ] Karteczka dodana w jednym kontekście widoczna w drugim (multi-device.feature, US-014)
 - [ ] Dym: plansza → karteczka "1410" → Generuj słowa → powtórka → wynik na liście plansz
+- [ ] Emotki na karteczce mają co najmniej 24 px przy powiększeniu 100% (note-enrichment.feature, US-016)
+- [ ] Dym iteracji 2: eksport planszy → import pliku → nowa plansza z tymi samymi karteczkami (export-import.feature)
 ```
 
 ## Test Data
@@ -130,6 +155,9 @@ Mapowane z `.prodready/define/test-scenarios/*.feature`:
 export const boardInput = { name: 'Historia Polski' }
 export const numericNote = { topic: '1410 – bitwa pod Grunwaldem', x: 100, y: 100 }
 export const textNote = { topic: 'Mitochondrium', imageWords: 'mity, chondryt', x: 320, y: 100 }
+// iteracja 2
+export const richNote = { topic: '1410', imageWords: 'tor, dos', story: 'Po torze jedzie dos', emoji: '🏰⚔️', color: 'red', x: 100, y: 300 }
+export const customPeg = { number: '333', word: 'mumia-mysz' }
 ```
 
 ### Seed Data
@@ -146,7 +174,7 @@ Testy uruchamiane przy każdym pushu i PR:
 
 ## Traceability
 
-67 kryteriów → 67 testów kanonicznych. Kolumna Red Confirmed jest uzupełniana w fazie Implement.
+119 kryteriów → 119 testów kanonicznych (67 z MVP, 52 z iteracji 2). Kolumna Red Confirmed jest uzupełniana w fazie Implement.
 
 | Story/Task | AC | Canonical Test File | Canonical Test Name | Red Confirmed |
 |------------|----|---------------------|---------------------|---------------|
@@ -217,6 +245,58 @@ Testy uruchamiane przy każdym pushu i PR:
 | TASK-022 | AC-1 | tests/integration/security.test.tsx | AC-1: Given dowolna odpowiedź aplikacji, when sprawdzam nagłówki, then zawiera `Content-Security-Policy` oraz `X-Content-Type-Options: nosniff`. | Yes |
 | TASK-022 | AC-2 | tests/integration/security.test.tsx | AC-2: Given karteczka z zagadnieniem `<script>alert(1)</script>`, when plansza ją renderuje, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | Yes |
 | TASK-023 | AC-1 | tests/integration/performance.test.ts | AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wywołuję GET /api/boards/{id}, then odpowiedź przychodzi w czasie krótszym niż 500 ms. | Yes |
+| TASK-024 | AC-1 | tests/integration/db-schema-v2.test.ts | AC-1: Given karteczka zapisana w bazie bez podania koloru, opowiadania i emotek, when ją odczytuję, then ma kolor `yellow` oraz puste opowiadanie i emotki. | No |
+| TASK-024 | AC-2 | tests/integration/db-schema-v2.test.ts | AC-2: Given tabela peg_word, when zapisuję hasło "333" bez słowa startowego, then zapis się udaje. | No |
+| TASK-024 | AC-3 | tests/integration/db-schema-v2.test.ts | AC-3: Given tabela peg_word, when zapisuję hasło "33" bez słowa startowego, then baza odrzuca zapis błędem ograniczenia CHECK. | No |
+| US-015 / TASK-025 | AC-1 | tests/integration/us-015-story.test.tsx | AC-1: Given karteczka z zagadnieniem "1410" i słowami-obrazami "tor, dos", when wpisuję opowiadanie "Po torze jedzie dos" i odświeżam stronę, then karteczka pokazuje to opowiadanie pod słowami-obrazami. | No |
+| US-015 / TASK-025 | AC-2 | tests/integration/us-015-story.test.tsx | AC-2: Given karteczka w powtórce mająca opowiadanie, when widzę jej zagadnienie przed odsłonięciem, then opowiadanie jest zakryte. | No |
+| US-015 / TASK-025 | AC-3 | tests/integration/us-015-story.test.tsx | AC-3: Given karteczka w powtórce mająca opowiadanie, when wybieram "Odsłoń", then widzę opowiadanie obok słów-obrazów. | No |
+| US-015 / TASK-025 | AC-4 | tests/integration/us-015-story.test.tsx | AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 znaków, then zmiana jest odrzucona i widzę komunikat "Opowiadanie może mieć najwyżej 2000 znaków". | No |
+| US-016 / TASK-026 | AC-1 | tests/integration/us-016-emoji.test.tsx | AC-1: Given karteczka na planszy, when wpisuję emotki "🏰⚔️" i odświeżam stronę, then karteczka pokazuje emotki "🏰⚔️". | No |
+| US-016 / TASK-026 | AC-2 | tests/e2e/us-016-emoji.spec.ts | AC-2: Given karteczka z emotkami na planszy przy powiększeniu 100%, when odczytuję rozmiar czcionki emotek, then wynosi on co najmniej 24 px. | No |
+| US-016 / TASK-026 | AC-3 | tests/integration/us-016-emoji.test.tsx | AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzucona i widzę komunikat "Najwyżej 8 emotek". | No |
+| US-016 / TASK-026 | AC-4 | tests/integration/us-016-emoji.test.tsx | AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte. | No |
+| US-017 / TASK-027 | AC-1 | tests/integration/us-017-colors.test.tsx | AC-1: Given otwarta plansza, when dodaję nową karteczkę, then karteczka ma kolor żółty. | No |
+| US-017 / TASK-027 | AC-2 | tests/integration/us-017-colors.test.tsx | AC-2: Given karteczka na planszy, when otwieram wybór koloru, then widzę dokładnie 5 kolorów: żółty, czerwony, pomarańczowy, zielony i niebieski. | No |
+| US-017 / TASK-027 | AC-3 | tests/integration/us-017-colors.test.tsx | AC-3: Given żółta karteczka, when zmieniam jej kolor na czerwony i odświeżam stronę, then karteczka jest czerwona. | No |
+| US-018 / TASK-028 | AC-1 | tests/integration/us-018-review-colors.test.tsx | AC-1: Given plansza z karteczkami czerwonymi i żółtymi mającymi słowa-obrazy, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then w powtórce pojawiają się wyłącznie czerwone karteczki. | No |
+| US-018 / TASK-028 | AC-2 | tests/integration/us-018-review-colors.test.tsx | AC-2: Given plansza z karteczkami w różnych kolorach, when otwieram rozpoczęcie powtórki, then wszystkie kolory są zaznaczone. | No |
+| US-018 / TASK-028 | AC-3 | tests/integration/us-018-review-colors.test.tsx | AC-3: Given plansza bez niebieskich karteczek ze słowami-obrazami, when rozpoczynam powtórkę z zaznaczonym tylko kolorem niebieskim, then powtórka się nie rozpoczyna i widzę komunikat "Brak karteczek w wybranych kolorach". | No |
+| US-018 / TASK-028 | AC-4 | tests/integration/us-018-review-colors.test.tsx | AC-4: Given łańcuch A→B→C, w którym A i C są czerwone, a B żółta, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then karteczki pojawiają się w kolejności A, C. | No |
+| TASK-029 | AC-1 | tests/unit/custom-pegs.test.ts | AC-1: Given własny wpis "333" i ciąg cyfr "48333", when dzielę ciąg na segmenty, then otrzymuję kolejno "48" i "333". | No |
+| TASK-029 | AC-2 | tests/unit/custom-pegs.test.ts | AC-2: Given własne wpisy "333" i "3334" oraz ciąg cyfr "3334", when dzielę ciąg na segmenty, then otrzymuję jeden segment "3334". | No |
+| TASK-029 | AC-3 | tests/unit/custom-pegs.test.ts | AC-3: Given własny wpis "333" i ciąg cyfr "3331333", when dzielę ciąg na segmenty, then otrzymuję kolejno "333", "1" i "333". | No |
+| US-019 / TASK-030 | AC-1 | tests/integration/us-019-custom-pegs.test.tsx | AC-1: Given lista GSP, when dodaję własny wpis "333" ze słowem "mumia-mysz", then wpis "333 – mumia-mysz" jest widoczny na liście własnych wpisów. | No |
+| US-019 / TASK-030 | AC-2 | tests/integration/us-019-custom-pegs.test.tsx | AC-2: Given istniejący własny wpis "333", when dodaję kolejny wpis "333", then wpis nie powstaje i widzę komunikat "Wpis dla tej liczby już istnieje". | No |
+| US-019 / TASK-030 | AC-3 | tests/integration/us-019-custom-pegs.test.tsx | AC-3: Given formularz własnego wpisu, when zatwierdzam liczbę "33", then wpis nie powstaje i widzę komunikat "Własny wpis musi mieć od 3 do 15 cyfr". | No |
+| US-019 / TASK-030 | AC-4 | tests/integration/us-019-custom-pegs.test.tsx | AC-4: Given własny wpis "333" ze słowem "mumia-mysz", when zmieniam słowo na "mamut", then wpis pokazuje "333 – mamut". | No |
+| US-019 / TASK-030 | AC-5 | tests/integration/us-019-custom-pegs.test.tsx | AC-5: Given własny wpis "333", when go usuwam, then wpisu nie ma na liście własnych wpisów. | No |
+| US-020 / TASK-031 | AC-1 | tests/integration/us-020-generate-custom.test.tsx | AC-1: Given własny wpis "333" ze słowem "mumia-mysz", when generuję słowa dla zagadnienia "333", then otrzymuję "mumia-mysz". | No |
+| US-020 / TASK-031 | AC-2 | tests/integration/us-020-generate-custom.test.tsx | AC-2: Given własny wpis "333", when generuję słowa dla zagadnienia "48333", then otrzymuję kolejno słowo z listy GSP dla "48" i "mumia-mysz". | No |
+| US-020 / TASK-031 | AC-3 | tests/integration/us-020-generate-custom.test.tsx | AC-3: Given własne wpisy "333" i "3334", when generuję słowa dla zagadnienia "3334", then otrzymuję słowo wpisu "3334". | No |
+| US-020 / TASK-031 | AC-4 | tests/integration/us-020-generate-custom.test.tsx | AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3". | No |
+| TASK-032 | AC-1 | tests/unit/transfer-format.test.ts | AC-1: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when serializuję ją do pliku i parsuję ten plik, then wynik zawiera te same 3 karteczki, 1 strefę i 2 połączenia. | No |
+| TASK-032 | AC-2 | tests/unit/transfer-format.test.ts | AC-2: Given plik z połączeniem wskazującym karteczkę spoza pliku, when go waliduję, then walidacja zwraca błąd. | No |
+| TASK-032 | AC-3 | tests/unit/transfer-format.test.ts | AC-3: Given plik z ogniwami łańcucha A→B, B→C i C→A, when go waliduję, then walidacja zwraca błąd. | No |
+| TASK-032 | AC-4 | tests/unit/transfer-format.test.ts | AC-4: Given plansza o nazwie "Żółta Historia Polski", when wyznaczam nazwę pliku eksportu, then nazwa zawiera "zolta-historia-polski". | No |
+| US-021 / TASK-033 | AC-1 | tests/integration/us-021-export.test.tsx | AC-1: Given plansza "Historia Polski", when wybieram "Eksportuj", then przeglądarka pobiera plik JSON, którego nazwa zawiera "historia-polski". | No |
+| US-021 / TASK-033 | AC-2 | tests/integration/us-021-export.test.tsx | AC-2: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when ją eksportuję, then plik zawiera 3 karteczki z zagadnieniem, słowami-obrazami, opowiadaniem, emotkami, kolorem i położeniem, 1 strefę i 2 połączenia. | No |
+| US-022 / TASK-034 | AC-1 | tests/integration/us-022-import.test.tsx | AC-1: Given plik eksportu planszy z 3 karteczkami, 1 strefą i łańcuchem A→B→C, when go importuję, then powstaje nowa plansza z 3 karteczkami, 1 strefą i łańcuchem w kolejności A, B, C. | No |
+| US-022 / TASK-034 | AC-2 | tests/integration/us-022-import.test.tsx | AC-2: Given istniejąca plansza "Historia" i plik eksportu planszy o nazwie "Historia", when importuję plik, then istniejąca plansza pozostaje bez zmian, a nowa nazywa się "Historia (import)". | No |
+| US-022 / TASK-034 | AC-3 | tests/integration/us-022-import.test.tsx | AC-3: Given plik, który nie jest eksportem Mnemoboard, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik nie jest poprawnym eksportem Mnemoboard". | No |
+| US-022 / TASK-034 | AC-4 | tests/integration/us-022-import.test.tsx | AC-4: Given plik większy niż 5 MB, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik jest za duży (limit 5 MB)". | No |
+| TASK-035 | AC-1 | tests/integration/backup-restore.test.ts | AC-1: Given hasło "14" o słowie równym startowemu i kopia ze słowem "tur" dla "14", when przywracam kopię, then hasło "14" ma słowo "tur". | No |
+| TASK-035 | AC-2 | tests/integration/backup-restore.test.ts | AC-2: Given hasło "14" zmienione przez użytkownika na "tara" i kopia ze słowem "tur" dla "14", when przywracam kopię, then hasło "14" nadal ma słowo "tara". | No |
+| TASK-035 | AC-3 | tests/integration/backup-restore.test.ts | AC-3: Given istniejący własny wpis "333" ze słowem "mamut" i kopia z wpisem "333" ze słowem "mumia-mysz", when przywracam kopię, then wpis "333" nadal ma słowo "mamut". | No |
+| TASK-035 | AC-4 | tests/integration/backup-restore.test.ts | AC-4: Given kopia z planszą mającą ukończoną powtórkę o wyniku 8 z 10, when przywracam kopię, then nowa plansza ma ukończoną powtórkę z 10 wynikami przypisanymi do jej własnych karteczek. | No |
+| US-023 / TASK-036 | AC-1 | tests/integration/us-023-backup.test.tsx | AC-1: Given 2 plansze, zmienione słowo GSP dla "14" i własny wpis "333", when wybieram "Pobierz kopię", then pobrany plik zawiera 2 plansze z historią powtórek, słowo dla "14" i wpis "333". | No |
+| US-023 / TASK-036 | AC-2 | tests/integration/us-023-backup.test.tsx | AC-2: Given świeża instalacja bez plansz i plik kopii z 2 planszami, zmienionym słowem dla "14" i wpisem "333", when przywracam kopię, then mam 2 plansze z wynikami ostatnich powtórek, zmienione słowo dla "14" i wpis "333". | No |
+| US-023 / TASK-036 | AC-3 | tests/integration/us-023-backup.test.tsx | AC-3: Given istniejąca plansza "Biologia" i plik kopii z 2 planszami, when przywracam kopię, then plansza "Biologia" pozostaje bez zmian, a lista ma 3 plansze. | No |
+| US-023 / TASK-036 | AC-4 | tests/integration/us-023-backup.test.tsx | AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then przed zapisem widzę komunikat "Zostaną dodane 2 plansze" i dane zmieniają się dopiero po potwierdzeniu. | No |
+| US-023 / TASK-036 | AC-5 | tests/integration/us-023-backup.test.tsx | AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard". | No |
+| TASK-037 | AC-1 | tests/integration/transfer-hardening.test.tsx | AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s. | No |
+| TASK-037 | AC-2 | tests/integration/transfer-hardening.test.tsx | AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s. | No |
+| TASK-037 | AC-3 | tests/integration/transfer-hardening.test.tsx | AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | No |
 
 ## Technical Tests
 
@@ -229,3 +309,7 @@ Testy dodatkowe, bez prefiksu `AC-N: `:
 - API: limity długości pól (topic 500, name 100, word 40); identyfikator w złym formacie → 400; nieistniejący zasób → 404.
 - Baza: kaskadowe usunięcie planszy usuwa sesje i wyniki; usunięcie karteczki usuwa jej wyniki.
 - Bezpieczeństwo: treść HTML w nazwie planszy, strefy i słowach-obrazach renderowana jako tekst.
+- Iteracja 2 — emotki: flaga, emotka z odcieniem skóry i sekwencja ZWJ liczą się jako jedna; dokładnie 8 emotek przechodzi.
+- Iteracja 2 — własne wpisy: liczba z zerami wiodącymi ("007"), wpis 15-cyfrowy, 16 cyfr → 400, limit 500 wpisów → 409 `PEG_LIMIT`; własny wpis nachodzący na wcześniejsze dopasowanie nie jest używany drugi raz.
+- Iteracja 2 — transfer: nieznana wersja formatu i zły `kind` → 400; plik kopii wysłany jako import planszy → 400; błąd w ostatniej planszy kopii nie zapisuje żadnej (transakcja); `dryRun` nie zmienia bazy; drugi import tego samego pliku, gdy istnieją już "Historia" i "Historia (import)", tworzy "Historia (import 2)".
+- Iteracja 2 — powtórka: `colors` z nieznanym kolorem → 400; filtr nie zmienia zapisu wyników ani statystyk.

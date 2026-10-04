@@ -584,6 +584,396 @@ AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wy
 
 ---
 
+## Sprint 5: Bogatsze karteczki (iteracja 2)
+
+### TASK-024: Migracja schematu iteracji 2
+**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+
+**Description**:
+Migracja Prisma: enum `note_color`, kolumny `note.story`, `note.emoji`, `note.color` (domyślnie `yellow`, także dla istniejących karteczek); `peg_word.number` do 15 znaków, `word` do 80, `default_word` dopuszcza NULL; ręcznie dopisane ograniczenie CHECK wiążące brak słowa startowego z długością liczby ≥ 3 (jak w ADR-002). Aktualizacja `schema.prisma` i typów.
+
+**Acceptance Criteria**:
+AC-1: Given karteczka zapisana w bazie bez podania koloru, opowiadania i emotek, when ją odczytuję, then ma kolor `yellow` oraz puste opowiadanie i emotki.
+AC-2: Given tabela peg_word, when zapisuję hasło "333" bez słowa startowego, then zapis się udaje.
+AC-3: Given tabela peg_word, when zapisuję hasło "33" bez słowa startowego, then baza odrzuca zapis błędem ograniczenia CHECK.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+
+**Blocked by**: None
+**Blocks**: TASK-025, TASK-026, TASK-027, TASK-030
+
+---
+
+### TASK-025: US-015 — Opowiadanie na karteczce
+**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+
+**Description**:
+Pole `story` w `NoteCreate`/`NoteUpdate`/`Note` (Zod, limit 2000) i w `ReviewCard`; pole "Opowiadanie" w NoteEditor; NoteNode pokazuje opowiadanie obcięte do 2 wierszy; ReviewCard zakrywa je i odsłania razem ze słowami-obrazami.
+
+**User Story**: US-015
+
+**Acceptance Criteria**:
+AC-1: Given karteczka z zagadnieniem "1410" i słowami-obrazami "tor, dos", when wpisuję opowiadanie "Po torze jedzie dos" i odświeżam stronę, then karteczka pokazuje to opowiadanie pod słowami-obrazami.
+AC-2: Given karteczka w powtórce mająca opowiadanie, when widzę jej zagadnienie przed odsłonięciem, then opowiadanie jest zakryte.
+AC-3: Given karteczka w powtórce mająca opowiadanie, when wybieram "Odsłoń", then widzę opowiadanie obok słów-obrazów.
+AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 znaków, then zmiana jest odrzucona i widzę komunikat "Opowiadanie może mieć najwyżej 2000 znaków".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-024
+**Blocks**: TASK-032
+
+---
+
+### TASK-026: US-016 — Emotki na karteczce
+**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+
+**Description**:
+Pole `emoji` w API karteczki i w `ReviewCard`; limit 8 znaków graficznych liczony przez `Intl.Segmenter` w schemacie Zod (ADR-006); pole "Emotki" w NoteEditor; NoteNode pokazuje emotki w rozmiarze `font-size-emoji` (24 px); ReviewCard zakrywa je do "Odsłoń". AC-2 wymaga prawdziwej przeglądarki (wyliczony rozmiar czcionki), więc jego test kanoniczny jest w Playwright.
+
+**User Story**: US-016
+
+**Acceptance Criteria**:
+AC-1: Given karteczka na planszy, when wpisuję emotki "🏰⚔️" i odświeżam stronę, then karteczka pokazuje emotki "🏰⚔️".
+AC-2: Given karteczka z emotkami na planszy przy powiększeniu 100%, when odczytuję rozmiar czcionki emotek, then wynosi on co najmniej 24 px.
+AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzucona i widzę komunikat "Najwyżej 8 emotek".
+AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-024
+**Blocks**: TASK-032
+
+---
+
+### TASK-027: US-017 — Kolory karteczek
+**Priority**: P0 | **Estimate**: 2.5h | **Status**: Ready
+
+**Description**:
+Pole `color` w API karteczki; tokeny pięciu kolorów w Tailwind; ColorSwatch i ColorPicker w NoteEditor (zapis od razu, `aria-label` z nazwą koloru); NoteNode przyjmuje tło i obramowanie według koloru.
+
+**User Story**: US-017
+
+**Acceptance Criteria**:
+AC-1: Given otwarta plansza, when dodaję nową karteczkę, then karteczka ma kolor żółty.
+AC-2: Given karteczka na planszy, when otwieram wybór koloru, then widzę dokładnie 5 kolorów: żółty, czerwony, pomarańczowy, zielony i niebieski.
+AC-3: Given żółta karteczka, when zmieniam jej kolor na czerwony i odświeżam stronę, then karteczka jest czerwona.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+
+**Blocked by**: TASK-024
+**Blocks**: TASK-028, TASK-032
+
+---
+
+### TASK-028: US-018 — Filtr koloru w powtórce
+**Priority**: P1 | **Estimate**: 3h | **Status**: Ready
+
+**Description**:
+Opcjonalne `colors` w `POST /api/boards/{id}/review-sessions`: filtr nakładany po wyliczeniu pełnej kolejności kart; błąd 422 `NO_NOTES_IN_COLORS`. Okno ReviewStart z ColorFilter otwierane przyciskiem "Rozpocznij powtórkę" w edytorze planszy; wybór trafia do strony powtórki w parametrze `?colors=`. Wejście na stronę powtórki bez parametru oznacza wszystkie kolory, więc dotychczasowe testy US-011 i US-012 pozostają bez zmian.
+
+**User Story**: US-018
+
+**Acceptance Criteria**:
+AC-1: Given plansza z karteczkami czerwonymi i żółtymi mającymi słowa-obrazy, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then w powtórce pojawiają się wyłącznie czerwone karteczki.
+AC-2: Given plansza z karteczkami w różnych kolorach, when otwieram rozpoczęcie powtórki, then wszystkie kolory są zaznaczone.
+AC-3: Given plansza bez niebieskich karteczek ze słowami-obrazami, when rozpoczynam powtórkę z zaznaczonym tylko kolorem niebieskim, then powtórka się nie rozpoczyna i widzę komunikat "Brak karteczek w wybranych kolorach".
+AC-4: Given łańcuch A→B→C, w którym A i C są czerwone, a B żółta, when rozpoczynam powtórkę z zaznaczonym tylko kolorem czerwonym, then karteczki pojawiają się w kolejności A, C.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-027
+**Blocks**: None
+
+---
+
+## Sprint 6: Własne wpisy GSP (iteracja 2)
+
+### TASK-029: Dopasowanie własnych wpisów w generatorze
+**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+
+**Description**:
+Czysta funkcja podziału ciągu cyfr z własnymi wpisami: wyszukanie od lewej, w tym samym miejscu najdłuższy wpis, fragmenty między dopasowaniami dzielone na pary. `generateWordImages` przyjmuje osobno hasła wbudowane i własne oraz zwraca `source` segmentu.
+
+**Acceptance Criteria**:
+AC-1: Given własny wpis "333" i ciąg cyfr "48333", when dzielę ciąg na segmenty, then otrzymuję kolejno "48" i "333".
+AC-2: Given własne wpisy "333" i "3334" oraz ciąg cyfr "3334", when dzielę ciąg na segmenty, then otrzymuję jeden segment "3334".
+AC-3: Given własny wpis "333" i ciąg cyfr "3331333", when dzielę ciąg na segmenty, then otrzymuję kolejno "333", "1" i "333".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+
+**Blocked by**: None
+**Blocks**: TASK-031
+
+---
+
+### TASK-030: US-019 — Zarządzanie własnymi wpisami GSP
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+
+**Description**:
+`POST /api/peg-words`, `DELETE /api/peg-words/{number}`, rozszerzony `PUT` (własny wpis do 80 znaków), pole `kind` w odpowiedzi, `reset` własnego wpisu → 409 `PEG_NO_DEFAULT`, limit 500 wpisów (`PEG_LIMIT`). Na stronie `/peg-words` sekcja CustomPegSection z formularzem, edycją w miejscu i usuwaniem; tabela 110 haseł wbudowanych pozostaje bez zmian.
+
+**User Story**: US-019
+
+**Acceptance Criteria**:
+AC-1: Given lista GSP, when dodaję własny wpis "333" ze słowem "mumia-mysz", then wpis "333 – mumia-mysz" jest widoczny na liście własnych wpisów.
+AC-2: Given istniejący własny wpis "333", when dodaję kolejny wpis "333", then wpis nie powstaje i widzę komunikat "Wpis dla tej liczby już istnieje".
+AC-3: Given formularz własnego wpisu, when zatwierdzam liczbę "33", then wpis nie powstaje i widzę komunikat "Własny wpis musi mieć od 3 do 15 cyfr".
+AC-4: Given własny wpis "333" ze słowem "mumia-mysz", when zmieniam słowo na "mamut", then wpis pokazuje "333 – mamut".
+AC-5: Given własny wpis "333", when go usuwam, then wpisu nie ma na liście własnych wpisów.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+- [ ] Write failing canonical test for AC-5
+- [ ] Implement AC-5 (red→green)
+
+**Blocked by**: TASK-024
+**Blocks**: TASK-031, TASK-035
+
+---
+
+### TASK-031: US-020 — Generator korzysta z własnych wpisów
+**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+
+**Description**:
+`POST /api/word-images/generate` wczytuje własne wpisy i przekazuje je do generatora z TASK-029; odpowiedź zawiera `source` segmentu. Akcja "Generuj słowa" w NoteEditor działa bez zmian w interfejsie.
+
+**User Story**: US-020
+
+**Acceptance Criteria**:
+AC-1: Given własny wpis "333" ze słowem "mumia-mysz", when generuję słowa dla zagadnienia "333", then otrzymuję "mumia-mysz".
+AC-2: Given własny wpis "333", when generuję słowa dla zagadnienia "48333", then otrzymuję kolejno słowo z listy GSP dla "48" i "mumia-mysz".
+AC-3: Given własne wpisy "333" i "3334", when generuję słowa dla zagadnienia "3334", then otrzymuję słowo wpisu "3334".
+AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333", then otrzymuję słowo z listy GSP dla "33" i słowo dla pojedynczej cyfry "3".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-029, TASK-030
+**Blocks**: None
+
+---
+
+## Sprint 7: Eksport, import i kopie zapasowe (iteracja 2)
+
+### TASK-032: Format pliku i walidacja (moduł transfer)
+**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+
+**Description**:
+Nowy moduł `src/modules/transfer`: schematy Zod `BoardExportFile` i `BackupFile` (format, wersja, rodzaj), serializacja planszy do pliku, walidacja powiązań z użyciem reguł modułu `arrangement` (połączenia tylko między karteczkami z pliku, jedno połączenie na parę, łańcuch bez pętli), nazwa pliku bez polskich znaków. Czyste funkcje, bez bazy.
+
+**Acceptance Criteria**:
+AC-1: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when serializuję ją do pliku i parsuję ten plik, then wynik zawiera te same 3 karteczki, 1 strefę i 2 połączenia.
+AC-2: Given plik z połączeniem wskazującym karteczkę spoza pliku, when go waliduję, then walidacja zwraca błąd.
+AC-3: Given plik z ogniwami łańcucha A→B, B→C i C→A, when go waliduję, then walidacja zwraca błąd.
+AC-4: Given plansza o nazwie "Żółta Historia Polski", when wyznaczam nazwę pliku eksportu, then nazwa zawiera "zolta-historia-polski".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-025, TASK-026, TASK-027
+**Blocks**: TASK-033
+
+---
+
+### TASK-033: US-021 — Eksport planszy
+**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+
+**Description**:
+`GET /api/boards/{id}/export` z nagłówkiem `Content-Disposition: attachment`; pozycja "Eksportuj" w menu BoardCard.
+
+**User Story**: US-021
+
+**Acceptance Criteria**:
+AC-1: Given plansza "Historia Polski", when wybieram "Eksportuj", then przeglądarka pobiera plik JSON, którego nazwa zawiera "historia-polski".
+AC-2: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when ją eksportuję, then plik zawiera 3 karteczki z zagadnieniem, słowami-obrazami, opowiadaniem, emotkami, kolorem i położeniem, 1 strefę i 2 połączenia.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+
+**Blocked by**: TASK-032
+**Blocks**: TASK-034
+
+---
+
+### TASK-034: US-022 — Import planszy
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+
+**Description**:
+`POST /api/boards/import`: limit 5 MB sprawdzany przed parsowaniem (osobny limit trasy ponad domyślny z `withApi`), walidacja całego pliku, zapis jedną transakcją z nowymi identyfikatorami (`createMany`), dopisek " (import)" przy zajętej nazwie (gdy i ta jest zajęta: " (import 2)", " (import 3)"…), przeliczenie `zoneId` z mapowania identyfikatorów. BackupPanel na liście plansz (także w pustym stanie) z przyciskiem "Importuj planszę" i komunikatami błędów.
+
+**User Story**: US-022
+
+**Acceptance Criteria**:
+AC-1: Given plik eksportu planszy z 3 karteczkami, 1 strefą i łańcuchem A→B→C, when go importuję, then powstaje nowa plansza z 3 karteczkami, 1 strefą i łańcuchem w kolejności A, B, C.
+AC-2: Given istniejąca plansza "Historia" i plik eksportu planszy o nazwie "Historia", when importuję plik, then istniejąca plansza pozostaje bez zmian, a nowa nazywa się "Historia (import)".
+AC-3: Given plik, który nie jest eksportem Mnemoboard, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik nie jest poprawnym eksportem Mnemoboard".
+AC-4: Given plik większy niż 5 MB, when go importuję, then żadna plansza nie powstaje i widzę komunikat "Plik jest za duży (limit 5 MB)".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-033
+**Blocks**: TASK-035
+
+---
+
+### TASK-035: Przywracanie kopii — reguły scalania
+**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+
+**Description**:
+Serwis przywracania w module `transfer`: każda plansza z kopii dodawana jako nowa z historią powtórek (wyniki przepięte na nowe identyfikatory karteczek); słowo hasła wbudowanego przyjmowane tylko wtedy, gdy bieżące równa się startowemu; własne wpisy tylko brakujące; tryb `dryRun` liczący zmiany bez zapisu; jedna transakcja.
+
+**Acceptance Criteria**:
+AC-1: Given hasło "14" o słowie równym startowemu i kopia ze słowem "tur" dla "14", when przywracam kopię, then hasło "14" ma słowo "tur".
+AC-2: Given hasło "14" zmienione przez użytkownika na "tara" i kopia ze słowem "tur" dla "14", when przywracam kopię, then hasło "14" nadal ma słowo "tara".
+AC-3: Given istniejący własny wpis "333" ze słowem "mamut" i kopia z wpisem "333" ze słowem "mumia-mysz", when przywracam kopię, then wpis "333" nadal ma słowo "mamut".
+AC-4: Given kopia z planszą mającą ukończoną powtórkę o wyniku 8 z 10, when przywracam kopię, then nowa plansza ma ukończoną powtórkę z 10 wynikami przypisanymi do jej własnych karteczek.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+
+**Blocked by**: TASK-030, TASK-034
+**Blocks**: TASK-036
+
+---
+
+### TASK-036: US-023 — Pełna kopia zapasowa
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+
+**Description**:
+`GET /api/backup` (plik `mnemoboard-kopia-<data>.json`) i `POST /api/backup/restore` z `dryRun` (limit 50 MB); w BackupPanel przyciski "Pobierz kopię" i "Przywróć z kopii"; RestoreConfirmDialog pokazuje wynik `dryRun` i zapisuje dopiero po potwierdzeniu.
+
+**User Story**: US-023
+
+**Acceptance Criteria**:
+AC-1: Given 2 plansze, zmienione słowo GSP dla "14" i własny wpis "333", when wybieram "Pobierz kopię", then pobrany plik zawiera 2 plansze z historią powtórek, słowo dla "14" i wpis "333".
+AC-2: Given świeża instalacja bez plansz i plik kopii z 2 planszami, zmienionym słowem dla "14" i wpisem "333", when przywracam kopię, then mam 2 plansze z wynikami ostatnich powtórek, zmienione słowo dla "14" i wpis "333".
+AC-3: Given istniejąca plansza "Biologia" i plik kopii z 2 planszami, when przywracam kopię, then plansza "Biologia" pozostaje bez zmian, a lista ma 3 plansze.
+AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then przed zapisem widzę komunikat "Zostaną dodane 2 plansze" i dane zmieniają się dopiero po potwierdzeniu.
+AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard".
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+- [ ] Write failing canonical test for AC-4
+- [ ] Implement AC-4 (red→green)
+- [ ] Write failing canonical test for AC-5
+- [ ] Implement AC-5 (red→green)
+
+**Blocked by**: TASK-035
+**Blocks**: TASK-037
+
+---
+
+### TASK-037: Wydajność i bezpieczeństwo plików
+**Priority**: P1 | **Estimate**: 2h | **Status**: Ready
+
+**Description**:
+Testy czasu importu i przywracania na dużych danych oraz renderowania treści z pliku jako tekstu; poprawki wsadowego zapisu, jeśli cele nie są spełnione.
+
+**Acceptance Criteria**:
+AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s.
+AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s.
+AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script.
+
+**TDD Tasks**:
+- [ ] Write failing canonical test for AC-1
+- [ ] Implement AC-1 (red→green)
+- [ ] Write failing canonical test for AC-2
+- [ ] Implement AC-2 (red→green)
+- [ ] Write failing canonical test for AC-3
+- [ ] Implement AC-3 (red→green)
+
+**Blocked by**: TASK-036
+**Blocks**: None
+
+---
+
 ## Task Summary
 
 | Sprint | Tasks | Total Estimate |
@@ -592,4 +982,7 @@ AC-1: Given plansza z 200 karteczkami, 20 strefami i 200 połączeniami, when wy
 | Sprint 2 | TASK-007 to TASK-011 (5) | 14.5h |
 | Sprint 3 | TASK-012 to TASK-015 (4) | 12h |
 | Sprint 4 | TASK-016 to TASK-023 (8) | 21h |
-| **Total** | **23 tasks, 67 AC** | **66h** |
+| Sprint 5 | TASK-024 to TASK-028 (5) | 13.5h |
+| Sprint 6 | TASK-029 to TASK-031 (3) | 7.5h |
+| Sprint 7 | TASK-032 to TASK-037 (6) | 17h |
+| **Total** | **37 tasks, 119 AC** | **104h** |
