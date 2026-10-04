@@ -294,9 +294,9 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-023 / TASK-036 | AC-3 | tests/integration/us-023-backup.test.tsx | AC-3: Given istniejąca plansza "Biologia" i plik kopii z 2 planszami, when przywracam kopię, then plansza "Biologia" pozostaje bez zmian, a lista ma 3 plansze. | Yes |
 | US-023 / TASK-036 | AC-4 | tests/integration/us-023-backup.test.tsx | AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then przed zapisem widzę komunikat "Zostaną dodane 2 plansze" i dane zmieniają się dopiero po potwierdzeniu. | Yes |
 | US-023 / TASK-036 | AC-5 | tests/integration/us-023-backup.test.tsx | AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard". | Yes |
-| TASK-037 | AC-1 | tests/integration/transfer-hardening.test.tsx | AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s. | No |
-| TASK-037 | AC-2 | tests/integration/transfer-hardening.test.tsx | AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s. | No |
-| TASK-037 | AC-3 | tests/integration/transfer-hardening.test.tsx | AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | No |
+| TASK-037 | AC-1 | tests/integration/transfer-hardening.test.tsx | AC-1: Given plik eksportu planszy z 200 karteczkami, 20 strefami i 200 połączeniami, when importuję go przez API, then odpowiedź przychodzi w czasie krótszym niż 2 s. | Yes |
+| TASK-037 | AC-2 | tests/integration/transfer-hardening.test.tsx | AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez API, then odpowiedź przychodzi w czasie krótszym niż 10 s. | Yes |
+| TASK-037 | AC-3 | tests/integration/transfer-hardening.test.tsx | AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script. | Yes |
 
 ## Technical Tests
 

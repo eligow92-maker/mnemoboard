@@ -951,7 +951,7 @@ AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie
 ---
 
 ### TASK-037: Wydajność i bezpieczeństwo plików
-**Priority**: P1 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P1 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 Testy czasu importu i przywracania na dużych danych oraz renderowania treści z pliku jako tekstu; poprawki wsadowego zapisu, jeśli cele nie są spełnione.
@@ -962,12 +962,12 @@ AC-2: Given plik kopii z 50 planszami po 200 karteczek, when przywracam go przez
 AC-3: Given plik eksportu z karteczką o zagadnieniu `<script>alert(1)</script>`, when importuję go i otwieram planszę, then zagadnienie jest widoczne jako tekst i nie powstaje element script.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
 
 **Blocked by**: TASK-036
 **Blocks**: None
