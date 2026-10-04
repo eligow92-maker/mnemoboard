@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { errorMessage } from "@/lib/api-client";
+import { downloadFromApi } from "@/lib/download";
 import type { BoardSummaryDto } from "@/lib/api-types";
 import { formatDate } from "@/lib/format";
 import { BoardForm } from "./board-form";
@@ -29,6 +30,15 @@ export function BoardCard({ board, onRename, onDelete }: BoardCardProps) {
   const [renaming, setRenaming] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleExport(): Promise<void> {
+    setError(null);
+    try {
+      await downloadFromApi(`/api/boards/${board.id}/export`);
+    } catch (caught) {
+      setError(errorMessage(caught));
+    }
+  }
 
   async function handleDelete(): Promise<void> {
     setConfirmingDelete(false);
@@ -74,6 +84,9 @@ export function BoardCard({ board, onRename, onDelete }: BoardCardProps) {
         <div className="flex gap-1 border-t border-border px-2 py-1">
           <Button variant="ghost" onClick={() => setRenaming(true)}>
             Zmień nazwę
+          </Button>
+          <Button variant="ghost" onClick={handleExport}>
+            Eksportuj
           </Button>
           <Button variant="ghost" className="text-error" onClick={() => setConfirmingDelete(true)}>
             Usuń

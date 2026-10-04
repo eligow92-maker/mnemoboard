@@ -11,6 +11,7 @@ const ROUTES: [pattern: string, load: () => Promise<RouteModule>][] = [
   ["/api/health", () => import("@/app/api/health/route")],
   ["/api/boards", () => import("@/app/api/boards/route")],
   ["/api/boards/[boardId]", () => import("@/app/api/boards/[boardId]/route")],
+  ["/api/boards/[boardId]/export", () => import("@/app/api/boards/[boardId]/export/route")],
   ["/api/boards/[boardId]/notes", () => import("@/app/api/boards/[boardId]/notes/route")],
   ["/api/notes/[noteId]", () => import("@/app/api/notes/[noteId]/route")],
   [

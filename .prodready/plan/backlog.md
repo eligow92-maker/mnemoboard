@@ -840,7 +840,7 @@ AC-4: Given plansza o nazwie "Żółta Historia Polski", when wyznaczam nazwę p
 ---
 
 ### TASK-033: US-021 — Eksport planszy
-**Priority**: P0 | **Estimate**: 2h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 2h | **Status**: Done
 
 **Description**:
 `GET /api/boards/{id}/export` z nagłówkiem `Content-Disposition: attachment`; pozycja "Eksportuj" w menu BoardCard.
@@ -852,10 +852,10 @@ AC-1: Given plansza "Historia Polski", when wybieram "Eksportuj", then przegląd
 AC-2: Given plansza z 3 karteczkami, 1 strefą i 2 połączeniami, when ją eksportuję, then plik zawiera 3 karteczki z zagadnieniem, słowami-obrazami, opowiadaniem, emotkami, kolorem i położeniem, 1 strefę i 2 połączenia.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
 
 **Blocked by**: TASK-032
 **Blocks**: TASK-034
