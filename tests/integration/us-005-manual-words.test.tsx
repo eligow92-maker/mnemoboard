@@ -99,6 +99,6 @@ describe("TASK-011 US-005 Ręczne słowa-obrazy", () => {
         (await prisma.note.findUniqueOrThrow({ where: { id: note.id } })).imageWords,
       ).toBeNull(),
     );
-    expect(getNoteNode(note.id)).not.toHaveTextContent("tor, dos");
+    await waitFor(() => expect(getNoteNode(note.id)).not.toHaveTextContent("tor, dos"));
   });
 });

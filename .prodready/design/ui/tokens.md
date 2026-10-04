@@ -7,7 +7,7 @@ Kierunek: korkowa tablica z papierowymi karteczkami — ciepłe tło, żółte k
 ### Brand
 - primary: #2F6F5E (akcent, przyciski główne, ogniwa łańcucha)
 - primary-dark: #24574A
-- secondary: #C2703D (strefy-pokoje, wyróżnienia)
+- secondary: #A85A2B (strefy-pokoje, wyróżnienia; biały tekst ma kontrast 5,05:1, WCAG AA)
 
 ### Semantic
 - success: #2E7D4F ("Pamiętałem", wynik ≥ 80%)
