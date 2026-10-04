@@ -3,6 +3,7 @@ import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 export interface NoteNodeData extends Record<string, unknown> {
   topic: string;
   imageWords: string | null;
+  story: string | null;
   // Numer kolejności w łańcuchu; null poza łańcuchem.
   chainPosition: number | null;
   // Nazwa pokoju, do którego karteczka jest przypisana; null poza pokojami.
@@ -46,6 +47,11 @@ export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) 
       {data.imageWords && (
         <p className="mt-1 break-words whitespace-pre-wrap text-text-secondary">
           {data.imageWords}
+        </p>
+      )}
+      {data.story && (
+        <p className="mt-1 line-clamp-2 break-words whitespace-pre-wrap text-text-secondary italic">
+          {data.story}
         </p>
       )}
       {data.zoneName !== null && (

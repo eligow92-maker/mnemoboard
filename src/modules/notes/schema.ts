@@ -17,11 +17,22 @@ const imageWords = z
   .transform((value) => (value === "" ? null : value))
   .nullable();
 
+export const NOTE_STORY_MAX_LENGTH = 2000;
+
+// Puste opowiadanie zapisujemy jako brak wartości.
+const story = z
+  .string()
+  .trim()
+  .max(NOTE_STORY_MAX_LENGTH, `Opowiadanie może mieć najwyżej ${NOTE_STORY_MAX_LENGTH} znaków`)
+  .transform((value) => (value === "" ? null : value))
+  .nullable();
+
 const coordinate = z.number({ required_error: "Podaj położenie" }).finite();
 
 export const noteCreateSchema = z.object({
   topic,
   imageWords: imageWords.optional(),
+  story: story.optional(),
   x: coordinate,
   y: coordinate,
 });
@@ -32,6 +43,7 @@ export const noteUpdateSchema = z
   .object({
     topic: topic.optional(),
     imageWords: imageWords.optional(),
+    story: story.optional(),
     x: coordinate.optional(),
     y: coordinate.optional(),
   })

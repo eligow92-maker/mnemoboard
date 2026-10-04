@@ -9,6 +9,7 @@ export interface ReviewCard {
   noteId: string;
   topic: string;
   imageWords: string;
+  story: string | null;
   zoneName: string | null;
 }
 
@@ -56,6 +57,7 @@ export async function startSession(boardId: string): Promise<ReviewSessionStart>
         noteId: note.id,
         topic: note.topic,
         imageWords: note.imageWords ?? "",
+        story: note.story,
         zoneName: note.zone?.name ?? null,
       },
     ];

@@ -24,6 +24,11 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
       {revealed ? (
         <div className="flex min-w-0 flex-col items-start gap-2">
           <p className="max-w-full text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
+          {card.story !== null && (
+            <p className="max-w-full break-words whitespace-pre-wrap text-text-secondary italic">
+              {card.story}
+            </p>
+          )}
           {card.zoneName !== null && (
             <span
               aria-label={`Pokój: ${card.zoneName}`}
@@ -34,7 +39,11 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
           )}
         </div>
       ) : (
-        <p className="text-text-secondary">Słowa-obrazy są zakryte.</p>
+        <p className="text-text-secondary">
+          {card.story !== null
+            ? "Słowa-obrazy i opowiadanie są zakryte."
+            : "Słowa-obrazy są zakryte."}
+        </p>
       )}
     </section>
   );

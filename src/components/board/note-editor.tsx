@@ -12,6 +12,7 @@ import { NOTE_TEXT_MAX_LENGTH, NOTE_TOPIC_REQUIRED_MESSAGE } from "@/modules/not
 export interface NoteEditorValues {
   topic: string;
   imageWords: string;
+  story: string;
 }
 
 interface NoteEditorProps {
@@ -28,6 +29,8 @@ export const NO_DIGITS_MESSAGE = "Brak liczb – wpisz słowa-obrazy samodzielni
 export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
   const [imageWords, setImageWords] = useState(initial.imageWords);
+  const [story, setStory] = useState(initial.story);
+  const [storyError, setStoryError] = useState<string | null>(null);
   // Wygenerowane słowa czekające na potwierdzenie zastąpienia dotychczasowych.
   const [pendingWords, setPendingWords] = useState<string | null>(null);
   const [wordsHint, setWordsHint] = useState<string | null>(null);
@@ -45,13 +48,16 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
 
     setSaving(true);
     setTopicError(null);
+    setStoryError(null);
     setFormError(null);
     try {
-      await onSave({ topic: trimmedTopic, imageWords: imageWords.trim() });
+      await onSave({ topic: trimmedTopic, imageWords: imageWords.trim(), story: story.trim() });
     } catch (caught) {
-      const fieldError = caught instanceof ApiClientError ? caught.fields.topic : undefined;
-      if (fieldError) setTopicError(fieldError);
-      else setFormError(errorMessage(caught));
+      const fields = caught instanceof ApiClientError ? caught.fields : {};
+      if (fields.topic || fields.story) {
+        setTopicError(fields.topic ?? null);
+        setStoryError(fields.story ?? null);
+      } else setFormError(errorMessage(caught));
       setSaving(false);
     }
   }
@@ -109,6 +115,13 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           value={imageWords}
           maxLength={NOTE_TEXT_MAX_LENGTH}
           onChange={(event) => setImageWords(event.target.value)}
+        />
+        <TextAreaField
+          id="note-story"
+          label="Opowiadanie"
+          value={story}
+          onChange={(event) => setStory(event.target.value)}
+          error={storyError}
         />
         {wordsHint && (
           <p role="status" className="text-sm text-warning">

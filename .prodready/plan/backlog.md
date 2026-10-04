@@ -611,7 +611,7 @@ AC-3: Given tabela peg_word, when zapisuję hasło "33" bez słowa startowego, t
 ---
 
 ### TASK-025: US-015 — Opowiadanie na karteczce
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Pole `story` w `NoteCreate`/`NoteUpdate`/`Note` (Zod, limit 2000) i w `ReviewCard`; pole "Opowiadanie" w NoteEditor; NoteNode pokazuje opowiadanie obcięte do 2 wierszy; ReviewCard zakrywa je i odsłania razem ze słowami-obrazami.
@@ -625,14 +625,14 @@ AC-3: Given karteczka w powtórce mająca opowiadanie, when wybieram "Odsłoń",
 AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 znaków, then zmiana jest odrzucona i widzę komunikat "Opowiadanie może mieć najwyżej 2000 znaków".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-024
 **Blocks**: TASK-032

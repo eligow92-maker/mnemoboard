@@ -25,6 +25,7 @@ export interface NoteDto {
   zoneId: string | null;
   topic: string;
   imageWords: string | null;
+  story: string | null;
   x: number;
   y: number;
   chainPosition: number | null;
@@ -78,6 +79,7 @@ export interface ReviewCardDto {
   noteId: string;
   topic: string;
   imageWords: string;
+  story: string | null;
   zoneName: string | null;
 }
 

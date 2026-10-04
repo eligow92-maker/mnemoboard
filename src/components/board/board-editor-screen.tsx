@@ -215,6 +215,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
     const note = await api<NoteDto>(`/api/boards/${boardId}/notes`, "POST", {
       topic: values.topic,
       imageWords: values.imageWords || null,
+      story: values.story || null,
       ...position,
     });
     setBoard((current) => current && { ...current, notes: [...current.notes, note] });
@@ -226,6 +227,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
       await api<NoteDto>(`/api/notes/${noteId}`, "PATCH", {
         topic: values.topic,
         imageWords: values.imageWords || null,
+        story: values.story || null,
       }),
     );
     setPanel(null);
@@ -310,7 +312,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         {panel?.kind === "new-note" && (
           <NoteEditor
             title="Nowa karteczka"
-            initial={{ topic: "", imageWords: "" }}
+            initial={{ topic: "", imageWords: "", story: "" }}
             onSave={(values) => createNote(panel.position, values)}
             onCancel={() => setPanel(null)}
           />
@@ -319,7 +321,11 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
           <NoteEditor
             key={editedNote.id}
             title="Edycja karteczki"
-            initial={{ topic: editedNote.topic, imageWords: editedNote.imageWords ?? "" }}
+            initial={{
+              topic: editedNote.topic,
+              imageWords: editedNote.imageWords ?? "",
+              story: editedNote.story ?? "",
+            }}
             onSave={(values) => saveNote(editedNote.id, values)}
             onCancel={() => setPanel(null)}
             onDelete={() => deleteNote(editedNote.id)}

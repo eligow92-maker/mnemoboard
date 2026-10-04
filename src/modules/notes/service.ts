@@ -20,6 +20,7 @@ export async function createNote(boardId: string, input: NoteCreateInput): Promi
       boardId,
       topic: input.topic,
       imageWords: input.imageWords ?? null,
+      story: input.story ?? null,
       x: input.x,
       y: input.y,
       zoneId: await zoneIdForPosition(boardId, input.x, input.y),
@@ -45,6 +46,7 @@ export async function updateNote(noteId: string, input: NoteUpdateInput): Promis
     data: {
       topic: input.topic,
       imageWords: input.imageWords,
+      story: input.story,
       x,
       y,
       zoneId: moved ? await zoneIdForPosition(current.boardId, x, y) : undefined,
