@@ -119,7 +119,7 @@ export function BoardListScreen() {
         </ul>
       )}
 
-      {boards !== null && <BackupPanel onBoardImported={() => void loadBoards()} />}
+      {boards !== null && <BackupPanel onDataChanged={() => void loadBoards()} />}
     </main>
   );
 }

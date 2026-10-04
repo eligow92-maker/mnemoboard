@@ -919,7 +919,7 @@ AC-4: Given kopia z planszą mającą ukończoną powtórkę o wyniku 8 z 10, wh
 ---
 
 ### TASK-036: US-023 — Pełna kopia zapasowa
-**Priority**: P0 | **Estimate**: 3.5h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3.5h | **Status**: Done
 
 **Description**:
 `GET /api/backup` (plik `mnemoboard-kopia-<data>.json`) i `POST /api/backup/restore` z `dryRun` (limit 50 MB); w BackupPanel przyciski "Pobierz kopię" i "Przywróć z kopii"; RestoreConfirmDialog pokazuje wynik `dryRun` i zapisuje dopiero po potwierdzeniu.
@@ -934,16 +934,16 @@ AC-4: Given plik kopii z 2 planszami, when wybieram "Przywróć z kopii", then p
 AC-5: Given uszkodzony plik kopii, when go przywracam, then żadne dane się nie zmieniają i widzę komunikat "Plik nie jest poprawną kopią Mnemoboard".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
-- [ ] Write failing canonical test for AC-5
-- [ ] Implement AC-5 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-5
+- [x] Implement AC-5 (red→green)
 
 **Blocked by**: TASK-035
 **Blocks**: TASK-037

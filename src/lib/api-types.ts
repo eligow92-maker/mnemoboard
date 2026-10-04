@@ -108,3 +108,10 @@ export interface ReviewSummaryDto {
 export interface StatsDto {
   sessionsLast7Days: number;
 }
+
+export interface RestoreResultDto {
+  dryRun: boolean;
+  boardsAdded: number;
+  pegWordsUpdated: number;
+  customPegWordsAdded: number;
+}

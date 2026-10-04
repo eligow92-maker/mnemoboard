@@ -2,13 +2,22 @@ import { randomUUID } from "node:crypto";
 import type { Board, Prisma, PrismaClient } from "@prisma/client";
 import { ApiError, notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
-import { buildBoardExportFile, exportFileName, parseBoardExportFile } from "./format";
 import {
+  backupFileName,
+  buildBoardExportFile,
+  exportFileName,
+  parseBackupFile,
+  parseBoardExportFile,
+  serializeBoard,
+} from "./format";
+import {
+  BACKUP_FILE_MAX_BYTES,
   BOARD_FILE_MAX_BYTES,
   type BackupBoard,
   type BackupFile,
   type BoardExportFile,
 } from "./schema";
+import { FILE_FORMAT, FILE_VERSION } from "./schema";
 import { CUSTOM_PEG_MAX_COUNT, PEG_WORD_MAX_LENGTH } from "@/modules/word-images/schema";
 
 // Plik eksportu planszy: karteczki, strefy i połączenia, bez historii powtórek.
@@ -253,4 +262,67 @@ export async function restoreBackup(
     },
     { timeout: 120_000 },
   );
+}
+
+// Pełna kopia: wszystkie plansze z historią powtórek oraz lista GSP — hasła wbudowane ze zmienionym
+// słowem i wszystkie własne wpisy.
+export async function buildBackup(
+  now = new Date(),
+): Promise<{ file: BackupFile; fileName: string }> {
+  const [boards, pegWords] = await Promise.all([
+    prisma.board.findMany({
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      include: {
+        notes: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        zones: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        connections: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        reviewSessions: {
+          orderBy: [{ startedAt: "asc" }, { id: "asc" }],
+          include: { results: { orderBy: { answeredAt: "asc" } } },
+        },
+      },
+    }),
+    prisma.pegWord.findMany(),
+  ]);
+
+  const file: BackupFile = {
+    format: FILE_FORMAT,
+    version: FILE_VERSION,
+    kind: "backup",
+    exportedAt: now.toISOString(),
+    boards: boards.map((board) => ({
+      ...serializeBoard(board),
+      reviewSessions: board.reviewSessions.map((session) => ({
+        startedAt: session.startedAt.toISOString(),
+        finishedAt: session.finishedAt?.toISOString() ?? null,
+        results: session.results.map((result) => ({
+          noteId: result.noteId,
+          remembered: result.remembered,
+          answeredAt: result.answeredAt.toISOString(),
+        })),
+      })),
+    })),
+    pegWords: pegWords
+      .filter((peg) => peg.defaultWord === null || peg.word !== peg.defaultWord)
+      .map((peg) => ({ number: peg.number, word: peg.word }))
+      .sort((a, b) => a.number.length - b.number.length || a.number.localeCompare(b.number)),
+  };
+  return { file, fileName: backupFileName(now) };
+}
+
+export const BACKUP_FILE_INVALID_MESSAGE = "Plik nie jest poprawną kopią Mnemoboard";
+
+// Wczytuje i waliduje plik kopii z żądania.
+export async function readBackupFile(request: Request): Promise<BackupFile> {
+  const json = await readJsonFile(request, {
+    maxBytes: BACKUP_FILE_MAX_BYTES,
+    label: "50 MB",
+    invalidCode: "INVALID_BACKUP_FILE",
+    invalidMessage: BACKUP_FILE_INVALID_MESSAGE,
+  });
+  const parsed = parseBackupFile(json);
+  if (!parsed.success) {
+    throw new ApiError(400, "INVALID_BACKUP_FILE", BACKUP_FILE_INVALID_MESSAGE);
+  }
+  return parsed.data;
 }
