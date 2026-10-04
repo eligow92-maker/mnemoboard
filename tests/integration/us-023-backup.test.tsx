@@ -198,7 +198,21 @@ describe("TASK-036 US-023 Pełna kopia zapasowa", () => {
     expect(await prisma.board.count()).toBe(0);
   });
 
-  it("plik eksportu pojedynczej planszy nie jest przyjmowany jako kopia", async () => {
+  it("pełna kopia wczytana jako import planszy dostaje wskazówkę, że należy użyć przywracania", async () => {
+    const user = userEvent.setup();
+    await prisma.board.create({ data: { name: "Jedna" } });
+    const backupText = await downloadBackupText();
+    render(<BoardListScreen />);
+
+    await user.upload(await screen.findByLabelText("Importuj planszę"), asFile(backupText));
+
+    expect(
+      await screen.findByText(/To jest pełna kopia zapasowa.*Przywróć z kopii/),
+    ).toBeInTheDocument();
+    expect(await prisma.board.count()).toBe(1);
+  });
+
+  it("plik eksportu pojedynczej planszy nie jest przyjmowany jako kopia i dostaje wskazówkę o imporcie", async () => {
     const user = userEvent.setup();
     const board = await prisma.board.create({ data: { name: "Jedna" } });
     const exported = await (await apiFetch(`/api/boards/${board.id}/export`)).text();
@@ -207,7 +221,9 @@ describe("TASK-036 US-023 Pełna kopia zapasowa", () => {
 
     await restoreVia(user, exported);
 
-    expect(await screen.findByText("Plik nie jest poprawną kopią Mnemoboard")).toBeInTheDocument();
+    expect(
+      await screen.findByText(/To jest eksport jednej planszy.*Importuj planszę/),
+    ).toBeInTheDocument();
     expect(await prisma.board.count()).toBe(0);
   });
 

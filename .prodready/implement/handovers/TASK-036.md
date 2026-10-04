@@ -41,3 +41,8 @@
 
 ## Next Recommended Task
 - TASK-037: Wydajność i bezpieczeństwo plików.
+
+## Poprawka po użyciu (2026-10-04)
+- Zgłoszenie: "Importuj planszę" odrzuciła plik z komunikatem "Plik nie jest poprawnym eksportem Mnemoboard". Z logów serwera: użytkownik pobrał pełną kopię ("Pobierz kopię", `GET /api/backup`) i wczytał ją jako import planszy (`kind: backup`), więc odrzucenie było zgodne z założeniem, ale komunikat mylący.
+- Zmiana: pełna kopia wczytana jako import dostaje "To jest pełna kopia zapasowa. Wczytaj ją przyciskiem „Przywróć z kopii”.", a eksport planszy wczytany jako kopia — "To jest eksport jednej planszy. Wczytaj go przyciskiem „Importuj planszę”." Kody błędów bez zmian (`INVALID_EXPORT_FILE`, `INVALID_BACKUP_FILE`).
+- Testy techniczne w `tests/integration/us-023-backup.test.tsx` (dwa nowe/zmienione); RED potwierdzony przed zmianą.

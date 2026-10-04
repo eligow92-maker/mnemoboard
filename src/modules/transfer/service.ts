@@ -132,6 +132,13 @@ export async function readJsonFile(
   }
 }
 
+// Rodzaj pliku Mnemoboard ("board" lub "backup"), jeśli to w ogóle plik Mnemoboard.
+function fileKind(json: unknown): unknown {
+  if (typeof json !== "object" || json === null) return undefined;
+  const { format, kind } = json as { format?: unknown; kind?: unknown };
+  return format === FILE_FORMAT ? kind : undefined;
+}
+
 export const BOARD_FILE_INVALID_MESSAGE = "Plik nie jest poprawnym eksportem Mnemoboard";
 
 // Wczytuje i waliduje plik eksportu planszy z żądania.
@@ -142,6 +149,14 @@ export async function readBoardExportFile(request: Request): Promise<BoardExport
     invalidCode: "INVALID_EXPORT_FILE",
     invalidMessage: BOARD_FILE_INVALID_MESSAGE,
   });
+  // Częsta pomyłka: pełna kopia ("Pobierz kopię") wczytana jako import jednej planszy.
+  if (fileKind(json) === "backup") {
+    throw new ApiError(
+      400,
+      "INVALID_EXPORT_FILE",
+      "To jest pełna kopia zapasowa. Wczytaj ją przyciskiem „Przywróć z kopii”.",
+    );
+  }
   const parsed = parseBoardExportFile(json);
   if (!parsed.success) {
     throw new ApiError(400, "INVALID_EXPORT_FILE", BOARD_FILE_INVALID_MESSAGE);
@@ -320,6 +335,13 @@ export async function readBackupFile(request: Request): Promise<BackupFile> {
     invalidCode: "INVALID_BACKUP_FILE",
     invalidMessage: BACKUP_FILE_INVALID_MESSAGE,
   });
+  if (fileKind(json) === "board") {
+    throw new ApiError(
+      400,
+      "INVALID_BACKUP_FILE",
+      "To jest eksport jednej planszy. Wczytaj go przyciskiem „Importuj planszę”.",
+    );
+  }
   const parsed = parseBackupFile(json);
   if (!parsed.success) {
     throw new ApiError(400, "INVALID_BACKUP_FILE", BACKUP_FILE_INVALID_MESSAGE);
