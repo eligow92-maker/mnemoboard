@@ -1,7 +1,8 @@
-.PHONY: dev dev-build dev-down logs shell test test-unit test-integration test-coverage test-e2e \
+.PHONY: build prod-up prod-down prod-logs prod-ps setup dev dev-build dev-down logs shell test test-unit test-integration test-coverage test-e2e \
 	lint lint-fix typecheck format db-migrate db-reset db-seed db-studio db-backup clean help
 
 EXEC := docker compose exec app
+PROD := docker compose -f compose.yaml -f compose.prod.yaml
 
 # ===========================================
 # Development
@@ -76,6 +77,28 @@ db-studio: ## Open database GUI
 db-backup: ## Dump the database to backups/
 	mkdir -p backups
 	docker compose exec -T db sh -c 'pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > backups/mnemoboard-$$(date +%Y%m%d-%H%M%S).sql
+
+# ===========================================
+# Production (dom: serwer lub komputer w sieci lokalnej, bez logowania — nie wystawiać do internetu)
+# ===========================================
+
+setup: ## First-time setup of the production stack (creates .env, builds, starts)
+	./scripts/setup.sh
+
+build: ## Build the production image
+	$(PROD) build
+
+prod-up: ## Start the production stack (waits until healthy)
+	$(PROD) up -d --build --wait
+
+prod-down: ## Stop the production stack (data is kept in the volume)
+	$(PROD) down
+
+prod-logs: ## Follow production logs
+	$(PROD) logs -f
+
+prod-ps: ## Show production containers and their health
+	$(PROD) ps
 
 # ===========================================
 # Cleanup
