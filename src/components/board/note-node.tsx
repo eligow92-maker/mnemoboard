@@ -1,0 +1,81 @@
+import { NOTE_COLOR_CLASSES } from "./note-colors";
+import type { NoteColor } from "@/modules/notes/colors";
+import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+
+export interface NoteNodeData extends Record<string, unknown> {
+  topic: string;
+  imageWords: string | null;
+  story: string | null;
+  emoji: string | null;
+  color: NoteColor;
+  // Numer kolejności w łańcuchu; null poza łańcuchem.
+  chainPosition: number | null;
+  // Nazwa pokoju, do którego karteczka jest przypisana; null poza pokojami.
+  zoneName: string | null;
+  // Karteczka wskazana jako początek tworzonego połączenia.
+  highlighted: boolean;
+}
+
+export type NoteFlowNode = Node<NoteNodeData, "note">;
+
+// Uchwyty są niewidoczne i nieklikalne — połączenia tworzy się trybem z paska narzędzi,
+// a React Flow potrzebuje uchwytów tylko po to, by narysować linię.
+const HANDLE_CLASS = "!pointer-events-none !top-1/2 !left-1/2 !h-px !w-px !border-0 !opacity-0";
+
+export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) {
+  return (
+    <div
+      data-note-color={data.color}
+      className={`relative min-h-24 w-[180px] rounded-sm border p-2 text-sm text-text-primary ${
+        NOTE_COLOR_CLASSES[data.color]
+      } ${selected || data.highlighted ? "border-primary ring-2 ring-primary" : ""} ${
+        dragging ? "shadow-note-drag" : "shadow-note"
+      }`}
+    >
+      <Handle
+        type="target"
+        position={Position.Top}
+        isConnectable={false}
+        className={HANDLE_CLASS}
+      />
+      {data.chainPosition !== null && (
+        <span
+          aria-label={`Kolejność w łańcuchu: ${data.chainPosition}`}
+          className="absolute -top-3 -right-3 flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-1 text-xs font-bold text-white shadow-note"
+        >
+          {data.chainPosition}
+        </span>
+      )}
+      {data.emoji && (
+        <p data-testid="note-emoji" className="text-emoji mb-1 leading-tight break-words">
+          {data.emoji}
+        </p>
+      )}
+      <p className="font-medium break-words whitespace-pre-wrap">{data.topic}</p>
+      {data.imageWords && (
+        <p className="mt-1 break-words whitespace-pre-wrap text-text-secondary">
+          {data.imageWords}
+        </p>
+      )}
+      {data.story && (
+        <p className="mt-1 line-clamp-2 break-words whitespace-pre-wrap text-text-secondary italic">
+          {data.story}
+        </p>
+      )}
+      {data.zoneName !== null && (
+        <span
+          aria-label={`Pokój: ${data.zoneName}`}
+          className="mt-2 inline-block max-w-full truncate rounded-full bg-secondary px-2 py-0.5 align-bottom text-xs font-medium text-white"
+        >
+          {data.zoneName}
+        </span>
+      )}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        isConnectable={false}
+        className={HANDLE_CLASS}
+      />
+    </div>
+  );
+}

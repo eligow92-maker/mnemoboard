@@ -1,0 +1,105 @@
+flowchart TD
+    subgraph Sprint1["Sprint 1: Fundament i pierwszy przekrój (walking skeleton)"]
+        T001["TASK-001: Szkielet projektu"]
+        T002["TASK-002: Schemat bazy i migracja"]
+        T003["TASK-003: Fundament API"]
+        T004["TASK-004: Prototyp planszy (React Flow, dotyk)"]
+        T005["TASK-005: US-001 Utworzenie pierwszej planszy"]
+        T006["TASK-006: US-003 Przyklejenie karteczki do planszy"]
+    end
+    subgraph Sprint2["Sprint 2: Karteczki i generator słów-obrazów"]
+        T007["TASK-007: US-004 Przesuwanie, edycja i usuwanie karteczki"]
+        T008["TASK-008: Startowa lista GSP i seed"]
+        T009["TASK-009: US-007 Edytowalna lista słów GSP"]
+        T010["TASK-010: US-006 Generowanie słów-obrazów dla liczb"]
+        T011["TASK-011: US-005 Ręczne słowa-obrazy"]
+    end
+    subgraph Sprint3["Sprint 3: Układanie karteczek"]
+        T012["TASK-012: US-008 Połączenia mapy myśli"]
+        T013["TASK-013: US-009 Łańcuch skojarzeń"]
+        T014["TASK-014: Geometria stref"]
+        T015["TASK-015: US-010 Pokoje pałacu pamięci"]
+    end
+    subgraph Sprint4["Sprint 4: Powtórka, statystyki, telefon, dopracowanie"]
+        T016["TASK-016: Kolejność kart powtórki"]
+        T017["TASK-017: US-011 Przebieg powtórki"]
+        T018["TASK-018: US-012 Zakres i kolejność powtórki"]
+        T019["TASK-019: US-013 Statystyki zapamiętywania"]
+        T020["TASK-020: US-002 Zarządzanie planszami"]
+        T021["TASK-021: US-014 Praca na telefonie"]
+        T022["TASK-022: Utwardzenie bezpieczeństwa"]
+        T023["TASK-023: Wydajność dużej planszy"]
+    end
+    subgraph Sprint5["Sprint 5: Bogatsze karteczki (iteracja 2)"]
+        T024["TASK-024: Migracja schematu iteracji 2"]
+        T025["TASK-025: US-015 Opowiadanie na karteczce"]
+        T026["TASK-026: US-016 Emotki na karteczce"]
+        T027["TASK-027: US-017 Kolory karteczek"]
+        T028["TASK-028: US-018 Filtr koloru w powtórce"]
+    end
+    subgraph Sprint6["Sprint 6: Własne wpisy GSP (iteracja 2)"]
+        T029["TASK-029: Dopasowanie własnych wpisów w generatorze"]
+        T030["TASK-030: US-019 Zarządzanie własnymi wpisami GSP"]
+        T031["TASK-031: US-020 Generator korzysta z własnych wpisów"]
+    end
+    subgraph Sprint7["Sprint 7: Eksport, import i kopie zapasowe (iteracja 2)"]
+        T032["TASK-032: Format pliku i walidacja (moduł transfer)"]
+        T033["TASK-033: US-021 Eksport planszy"]
+        T034["TASK-034: US-022 Import planszy"]
+        T035["TASK-035: Przywracanie kopii reguły scalania"]
+        T036["TASK-036: US-023 Pełna kopia zapasowa"]
+        T037["TASK-037: Wydajność i bezpieczeństwo plików"]
+    end
+
+    T001 --> T002
+    T002 --> T003
+    T001 --> T004
+    T003 --> T005
+    T004 --> T006
+    T005 --> T006
+    T006 --> T007
+    T002 --> T008
+    T003 --> T009
+    T008 --> T009
+    T010 --> T009
+    T007 --> T010
+    T008 --> T010
+    T010 --> T011
+    T007 --> T012
+    T012 --> T013
+    T002 --> T014
+    T007 --> T015
+    T014 --> T015
+    T013 --> T016
+    T011 --> T017
+    T016 --> T017
+    T015 --> T018
+    T017 --> T018
+    T017 --> T019
+    T019 --> T020
+    T018 --> T021
+    T015 --> T021
+    T006 --> T022
+    T015 --> T023
+    T024 --> T025
+    T024 --> T026
+    T024 --> T027
+    T027 --> T028
+    T024 --> T030
+    T029 --> T031
+    T030 --> T031
+    T025 --> T032
+    T026 --> T032
+    T027 --> T032
+    T032 --> T033
+    T033 --> T034
+    T030 --> T035
+    T034 --> T035
+    T035 --> T036
+    T036 --> T037
+
+    style T004 fill:#F59E0B
+    style T006 fill:#10B981
+    style T021 fill:#F59E0B
+    style T024 fill:#10B981
+    style T035 fill:#F59E0B

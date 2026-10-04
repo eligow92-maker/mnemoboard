@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Tokeny z .prodready/design/ui/tokens.md */
+@theme {
+  --color-primary: #2f6f5e;
+  --color-primary-dark: #24574a;
+  --color-secondary: #a85a2b;
+
+  --color-success: #2e7d4f;
+  --color-warning: #b7791f;
+  --color-error: #c0392b;
+  --color-info: #2b6cb0;
+
+  --color-background: #f6f1e7;
+  --color-board: #eadfc8;
+  --color-surface: #fffdf8;
+  --color-text-primary: #2a2622;
+  --color-text-secondary: #6b635a;
+  --color-border: #d9cfbd;
+
+  --color-note: #fff3a6;
+  --color-note-yellow: #fff3a6;
+  --color-note-yellow-border: #e6d36a;
+  --color-note-red: #ffc9c2;
+  --color-note-red-border: #e08a7e;
+  --color-note-orange: #ffd9a8;
+  --color-note-orange-border: #e3a85c;
+  --color-note-green: #cdebc0;
+  --color-note-green-border: #8cc27a;
+  --color-note-blue: #c6e2f7;
+  --color-note-blue-border: #7fb2da;
+  --color-note-border: #e6d36a;
+  --color-note-selected: #ffe66d;
+  --color-zone-fill: rgb(194 112 61 / 0.1);
+  --color-zone-border: #c2703d;
+  --color-edge-association: #8a8072;
+  --color-edge-chain: #2f6f5e;
+
+  --text-emoji: 1.5rem; /* emotki na karteczce: 24 px przy powiększeniu 100% (US-016) */
+  --text-emoji-review: 2.5rem;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-note: 0 2px 4px rgb(42 38 34 / 0.18);
+  --shadow-note-drag: 0 8px 16px rgb(42 38 34 / 0.25);
+}
+
+/* Przyciski powiększania planszy jako cele dotykowe 44 px (touch-target-min). */
+.react-flow .react-flow__controls .react-flow__controls-button {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
+}

@@ -1,0 +1,41 @@
+# Nakładka produkcyjna na compose.yaml (dom: serwer lub komputer w sieci lokalnej).
+# Uruchamianie (compose.override.yaml NIE jest wtedy ładowany, więc bez bind mountów i trybu dev):
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build --wait
+# albo: make prod-up
+services:
+  app:
+    # Własny tag, żeby obraz produkcyjny nie nadpisywał obrazu deweloperskiego (mnemoboard).
+    image: mnemoboard:prod
+    build:
+      target: runner
+    environment:
+      - NODE_ENV=production
+    # Aplikacja nie ma logowania (ADR-003) — port jest dla sieci lokalnej. Nie przekierowuj go
+    # na routerze i nie wystawiaj do internetu.
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    restart: unless-stopped
+    # Kontener sam ma HEALTHCHECK (Dockerfile); tu tylko dopasowanie do kolejności startu.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 768M
+
+  db:
+    restart: unless-stopped
+    environment:
+      # Domyślne hasło z .env.example nie nadaje się na produkcję.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Ustaw POSTGRES_PASSWORD w .env}
+    # Baza nie jest publikowana na hoście — dostęp tylko z kontenera aplikacji.
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
