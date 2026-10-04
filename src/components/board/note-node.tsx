@@ -4,6 +4,7 @@ export interface NoteNodeData extends Record<string, unknown> {
   topic: string;
   imageWords: string | null;
   story: string | null;
+  emoji: string | null;
   // Numer kolejności w łańcuchu; null poza łańcuchem.
   chainPosition: number | null;
   // Nazwa pokoju, do którego karteczka jest przypisana; null poza pokojami.
@@ -42,6 +43,11 @@ export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) 
         >
           {data.chainPosition}
         </span>
+      )}
+      {data.emoji && (
+        <p data-testid="note-emoji" className="text-emoji mb-1 leading-tight break-words">
+          {data.emoji}
+        </p>
       )}
       <p className="font-medium break-words whitespace-pre-wrap">{data.topic}</p>
       {data.imageWords && (

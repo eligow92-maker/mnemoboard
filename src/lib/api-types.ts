@@ -26,6 +26,7 @@ export interface NoteDto {
   topic: string;
   imageWords: string | null;
   story: string | null;
+  emoji: string | null;
   x: number;
   y: number;
   chainPosition: number | null;
@@ -80,6 +81,7 @@ export interface ReviewCardDto {
   topic: string;
   imageWords: string;
   story: string | null;
+  emoji: string | null;
   zoneName: string | null;
 }
 

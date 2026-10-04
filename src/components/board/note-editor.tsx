@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { TextAreaField } from "@/components/ui/field";
+import { TextAreaField, TextField } from "@/components/ui/field";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { GeneratedWordImagesDto } from "@/lib/api-types";
@@ -13,6 +13,7 @@ export interface NoteEditorValues {
   topic: string;
   imageWords: string;
   story: string;
+  emoji: string;
 }
 
 interface NoteEditorProps {
@@ -31,6 +32,8 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
   const [imageWords, setImageWords] = useState(initial.imageWords);
   const [story, setStory] = useState(initial.story);
   const [storyError, setStoryError] = useState<string | null>(null);
+  const [emoji, setEmoji] = useState(initial.emoji);
+  const [emojiError, setEmojiError] = useState<string | null>(null);
   // Wygenerowane słowa czekające na potwierdzenie zastąpienia dotychczasowych.
   const [pendingWords, setPendingWords] = useState<string | null>(null);
   const [wordsHint, setWordsHint] = useState<string | null>(null);
@@ -49,14 +52,21 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
     setSaving(true);
     setTopicError(null);
     setStoryError(null);
+    setEmojiError(null);
     setFormError(null);
     try {
-      await onSave({ topic: trimmedTopic, imageWords: imageWords.trim(), story: story.trim() });
+      await onSave({
+        topic: trimmedTopic,
+        imageWords: imageWords.trim(),
+        story: story.trim(),
+        emoji: emoji.trim(),
+      });
     } catch (caught) {
       const fields = caught instanceof ApiClientError ? caught.fields : {};
-      if (fields.topic || fields.story) {
+      if (fields.topic || fields.story || fields.emoji) {
         setTopicError(fields.topic ?? null);
         setStoryError(fields.story ?? null);
+        setEmojiError(fields.emoji ?? null);
       } else setFormError(errorMessage(caught));
       setSaving(false);
     }
@@ -115,6 +125,13 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           value={imageWords}
           maxLength={NOTE_TEXT_MAX_LENGTH}
           onChange={(event) => setImageWords(event.target.value)}
+        />
+        <TextField
+          id="note-emoji"
+          label="Emotki"
+          value={emoji}
+          onChange={(event) => setEmoji(event.target.value)}
+          error={emojiError}
         />
         <TextAreaField
           id="note-story"

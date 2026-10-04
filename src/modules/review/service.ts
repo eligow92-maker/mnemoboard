@@ -10,6 +10,7 @@ export interface ReviewCard {
   topic: string;
   imageWords: string;
   story: string | null;
+  emoji: string | null;
   zoneName: string | null;
 }
 
@@ -58,6 +59,7 @@ export async function startSession(boardId: string): Promise<ReviewSessionStart>
         topic: note.topic,
         imageWords: note.imageWords ?? "",
         story: note.story,
+        emoji: note.emoji,
         zoneName: note.zone?.name ?? null,
       },
     ];

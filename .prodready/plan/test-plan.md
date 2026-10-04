@@ -252,10 +252,10 @@ Testy uruchamiane przy każdym pushu i PR:
 | US-015 / TASK-025 | AC-2 | tests/integration/us-015-story.test.tsx | AC-2: Given karteczka w powtórce mająca opowiadanie, when widzę jej zagadnienie przed odsłonięciem, then opowiadanie jest zakryte. | Yes |
 | US-015 / TASK-025 | AC-3 | tests/integration/us-015-story.test.tsx | AC-3: Given karteczka w powtórce mająca opowiadanie, when wybieram "Odsłoń", then widzę opowiadanie obok słów-obrazów. | Yes |
 | US-015 / TASK-025 | AC-4 | tests/integration/us-015-story.test.tsx | AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 znaków, then zmiana jest odrzucona i widzę komunikat "Opowiadanie może mieć najwyżej 2000 znaków". | Yes |
-| US-016 / TASK-026 | AC-1 | tests/integration/us-016-emoji.test.tsx | AC-1: Given karteczka na planszy, when wpisuję emotki "🏰⚔️" i odświeżam stronę, then karteczka pokazuje emotki "🏰⚔️". | No |
-| US-016 / TASK-026 | AC-2 | tests/e2e/us-016-emoji.spec.ts | AC-2: Given karteczka z emotkami na planszy przy powiększeniu 100%, when odczytuję rozmiar czcionki emotek, then wynosi on co najmniej 24 px. | No |
-| US-016 / TASK-026 | AC-3 | tests/integration/us-016-emoji.test.tsx | AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzucona i widzę komunikat "Najwyżej 8 emotek". | No |
-| US-016 / TASK-026 | AC-4 | tests/integration/us-016-emoji.test.tsx | AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte. | No |
+| US-016 / TASK-026 | AC-1 | tests/integration/us-016-emoji.test.tsx | AC-1: Given karteczka na planszy, when wpisuję emotki "🏰⚔️" i odświeżam stronę, then karteczka pokazuje emotki "🏰⚔️". | Yes |
+| US-016 / TASK-026 | AC-2 | tests/e2e/us-016-emoji.spec.ts | AC-2: Given karteczka z emotkami na planszy przy powiększeniu 100%, when odczytuję rozmiar czcionki emotek, then wynosi on co najmniej 24 px. | Yes |
+| US-016 / TASK-026 | AC-3 | tests/integration/us-016-emoji.test.tsx | AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzucona i widzę komunikat "Najwyżej 8 emotek". | Yes |
+| US-016 / TASK-026 | AC-4 | tests/integration/us-016-emoji.test.tsx | AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte. | Yes |
 | US-017 / TASK-027 | AC-1 | tests/integration/us-017-colors.test.tsx | AC-1: Given otwarta plansza, when dodaję nową karteczkę, then karteczka ma kolor żółty. | No |
 | US-017 / TASK-027 | AC-2 | tests/integration/us-017-colors.test.tsx | AC-2: Given karteczka na planszy, when otwieram wybór koloru, then widzę dokładnie 5 kolorów: żółty, czerwony, pomarańczowy, zielony i niebieski. | No |
 | US-017 / TASK-027 | AC-3 | tests/integration/us-017-colors.test.tsx | AC-3: Given żółta karteczka, when zmieniam jej kolor na czerwony i odświeżam stronę, then karteczka jest czerwona. | No |

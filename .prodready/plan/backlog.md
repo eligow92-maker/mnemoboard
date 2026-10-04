@@ -640,7 +640,7 @@ AC-4: Given formularz karteczki, when zapisuję opowiadanie dłuższe niż 2000 
 ---
 
 ### TASK-026: US-016 — Emotki na karteczce
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Pole `emoji` w API karteczki i w `ReviewCard`; limit 8 znaków graficznych liczony przez `Intl.Segmenter` w schemacie Zod (ADR-006); pole "Emotki" w NoteEditor; NoteNode pokazuje emotki w rozmiarze `font-size-emoji` (24 px); ReviewCard zakrywa je do "Odsłoń". AC-2 wymaga prawdziwej przeglądarki (wyliczony rozmiar czcionki), więc jego test kanoniczny jest w Playwright.
@@ -654,14 +654,14 @@ AC-3: Given formularz karteczki, when zapisuję 9 emotek, then zmiana jest odrzu
 AC-4: Given karteczka w powtórce mająca emotki, when widzę jej zagadnienie przed odsłonięciem, then emotki są zakryte.
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-024
 **Blocks**: TASK-032

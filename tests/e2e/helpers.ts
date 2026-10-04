@@ -14,7 +14,7 @@ export async function deleteBoard(request: APIRequestContext, boardId: string): 
 export async function createNote(
   request: APIRequestContext,
   boardId: string,
-  note: { topic: string; x: number; y: number; imageWords?: string },
+  note: { topic: string; x: number; y: number; imageWords?: string; emoji?: string },
 ): Promise<string> {
   const response = await request.post(`/api/boards/${boardId}/notes`, { data: note });
   expect(response.status()).toBe(201);

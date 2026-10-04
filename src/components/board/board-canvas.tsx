@@ -25,6 +25,7 @@ export interface CanvasNote {
   topic: string;
   imageWords: string | null;
   story?: string | null;
+  emoji?: string | null;
   chainPosition?: number | null;
   zoneId?: string | null;
   x: number;
@@ -83,6 +84,7 @@ function toNoteNode(
       topic: note.topic,
       imageWords: note.imageWords,
       story: note.story ?? null,
+      emoji: note.emoji ?? null,
       chainPosition: note.chainPosition ?? null,
       zoneName: (note.zoneId && zoneNames.get(note.zoneId)) || null,
       highlighted: note.id === highlightedNoteId,

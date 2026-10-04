@@ -216,6 +216,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
       topic: values.topic,
       imageWords: values.imageWords || null,
       story: values.story || null,
+      emoji: values.emoji || null,
       ...position,
     });
     setBoard((current) => current && { ...current, notes: [...current.notes, note] });
@@ -228,6 +229,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         topic: values.topic,
         imageWords: values.imageWords || null,
         story: values.story || null,
+        emoji: values.emoji || null,
       }),
     );
     setPanel(null);
@@ -312,7 +314,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         {panel?.kind === "new-note" && (
           <NoteEditor
             title="Nowa karteczka"
-            initial={{ topic: "", imageWords: "", story: "" }}
+            initial={{ topic: "", imageWords: "", story: "", emoji: "" }}
             onSave={(values) => createNote(panel.position, values)}
             onCancel={() => setPanel(null)}
           />
@@ -325,6 +327,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
               topic: editedNote.topic,
               imageWords: editedNote.imageWords ?? "",
               story: editedNote.story ?? "",
+              emoji: editedNote.emoji ?? "",
             }}
             onSave={(values) => saveNote(editedNote.id, values)}
             onCancel={() => setPanel(null)}

@@ -27,12 +27,36 @@ const story = z
   .transform((value) => (value === "" ? null : value))
   .nullable();
 
+export const NOTE_EMOJI_MAX_COUNT = 8;
+export const NOTE_EMOJI_TOO_MANY_MESSAGE = `Najwyżej ${NOTE_EMOJI_MAX_COUNT} emotek`;
+// Kolumna ma 64 znaki; limit 8 liczymy w znakach graficznych (ADR-006), więc złożone emotki
+// (flagi, odcienie skóry, sekwencje ZWJ) liczą się jako jedna.
+const EMOJI_COLUMN_MAX_LENGTH = 64;
+const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
+export function countGraphemes(value: string): number {
+  return [...graphemes.segment(value)].length;
+}
+
+// Puste emotki zapisujemy jako brak wartości.
+const emoji = z
+  .string()
+  .trim()
+  .refine(
+    (value) =>
+      countGraphemes(value) <= NOTE_EMOJI_MAX_COUNT && value.length <= EMOJI_COLUMN_MAX_LENGTH,
+    NOTE_EMOJI_TOO_MANY_MESSAGE,
+  )
+  .transform((value) => (value === "" ? null : value))
+  .nullable();
+
 const coordinate = z.number({ required_error: "Podaj położenie" }).finite();
 
 export const noteCreateSchema = z.object({
   topic,
   imageWords: imageWords.optional(),
   story: story.optional(),
+  emoji: emoji.optional(),
   x: coordinate,
   y: coordinate,
 });
@@ -44,6 +68,7 @@ export const noteUpdateSchema = z
     topic: topic.optional(),
     imageWords: imageWords.optional(),
     story: story.optional(),
+    emoji: emoji.optional(),
     x: coordinate.optional(),
     y: coordinate.optional(),
   })

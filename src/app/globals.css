@@ -26,6 +26,9 @@
   --color-edge-association: #8a8072;
   --color-edge-chain: #2f6f5e;
 
+  --text-emoji: 1.5rem; /* emotki na karteczce: 24 px przy powiększeniu 100% (US-016) */
+  --text-emoji-review: 2.5rem;
+
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --shadow-note: 0 2px 4px rgb(42 38 34 / 0.18);

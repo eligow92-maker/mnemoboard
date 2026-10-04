@@ -9,6 +9,16 @@ import type { ReviewCardDto, ReviewSessionStartDto, ReviewSummaryDto } from "@/l
 const LINK_BUTTON_CLASS =
   "inline-flex min-h-11 w-full items-center justify-center rounded-md bg-primary px-4 font-medium text-white hover:bg-primary-dark";
 
+// Co jeszcze, poza słowami-obrazami, jest zakryte do "Odsłoń".
+function hiddenLabel(card: ReviewCardDto): string {
+  const extras = [card.story !== null && "opowiadanie", card.emoji !== null && "emotki"].filter(
+    (extra): extra is string => extra !== false,
+  );
+  const parts = ["Słowa-obrazy", ...extras];
+  const last = parts.pop();
+  return `${parts.length > 0 ? `${parts.join(", ")} i ` : ""}${last} są zakryte.`;
+}
+
 function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean }) {
   return (
     <section
@@ -23,6 +33,9 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
       </p>
       {revealed ? (
         <div className="flex min-w-0 flex-col items-start gap-2">
+          {card.emoji !== null && (
+            <p className="text-emoji-review leading-tight break-words">{card.emoji}</p>
+          )}
           <p className="max-w-full text-xl break-words whitespace-pre-wrap">{card.imageWords}</p>
           {card.story !== null && (
             <p className="max-w-full break-words whitespace-pre-wrap text-text-secondary italic">
@@ -39,11 +52,7 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
           )}
         </div>
       ) : (
-        <p className="text-text-secondary">
-          {card.story !== null
-            ? "Słowa-obrazy i opowiadanie są zakryte."
-            : "Słowa-obrazy są zakryte."}
-        </p>
+        <p className="text-text-secondary">{hiddenLabel(card)}</p>
       )}
     </section>
   );
