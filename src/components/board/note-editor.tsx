@@ -7,6 +7,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { GeneratedWordImagesDto } from "@/lib/api-types";
 import { SidePanel } from "./side-panel";
+import { ColorPicker } from "./color-picker";
+import type { NoteColor } from "@/modules/notes/colors";
 import { NOTE_TEXT_MAX_LENGTH, NOTE_TOPIC_REQUIRED_MESSAGE } from "@/modules/notes/schema";
 
 export interface NoteEditorValues {
@@ -14,6 +16,7 @@ export interface NoteEditorValues {
   imageWords: string;
   story: string;
   emoji: string;
+  color: NoteColor;
 }
 
 interface NoteEditorProps {
@@ -23,16 +26,26 @@ interface NoteEditorProps {
   onCancel: () => void;
   // Tylko dla istniejącej karteczki.
   onDelete?: () => Promise<void>;
+  // Tylko dla istniejącej karteczki: kolor zapisuje się od razu po wyborze.
+  onColorChange?: (color: NoteColor) => Promise<void>;
 }
 
 export const NO_DIGITS_MESSAGE = "Brak liczb – wpisz słowa-obrazy samodzielnie";
 
-export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteEditorProps) {
+export function NoteEditor({
+  title,
+  initial,
+  onSave,
+  onCancel,
+  onDelete,
+  onColorChange,
+}: NoteEditorProps) {
   const [topic, setTopic] = useState(initial.topic);
   const [imageWords, setImageWords] = useState(initial.imageWords);
   const [story, setStory] = useState(initial.story);
   const [storyError, setStoryError] = useState<string | null>(null);
   const [emoji, setEmoji] = useState(initial.emoji);
+  const [color, setColor] = useState(initial.color);
   const [emojiError, setEmojiError] = useState<string | null>(null);
   // Wygenerowane słowa czekające na potwierdzenie zastąpienia dotychczasowych.
   const [pendingWords, setPendingWords] = useState<string | null>(null);
@@ -60,6 +73,7 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
         imageWords: imageWords.trim(),
         story: story.trim(),
         emoji: emoji.trim(),
+        color,
       });
     } catch (caught) {
       const fields = caught instanceof ApiClientError ? caught.fields : {};
@@ -69,6 +83,18 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
         setEmojiError(fields.emoji ?? null);
       } else setFormError(errorMessage(caught));
       setSaving(false);
+    }
+  }
+
+  async function handleColorChange(next: NoteColor): Promise<void> {
+    const previous = color;
+    setColor(next);
+    if (!onColorChange) return;
+    try {
+      await onColorChange(next);
+    } catch (caught) {
+      setColor(previous);
+      setFormError(errorMessage(caught));
     }
   }
 
@@ -126,6 +152,10 @@ export function NoteEditor({ title, initial, onSave, onCancel, onDelete }: NoteE
           maxLength={NOTE_TEXT_MAX_LENGTH}
           onChange={(event) => setImageWords(event.target.value)}
         />
+        <div>
+          <p className="mb-1 text-sm font-medium">Kolor</p>
+          <ColorPicker value={color} onChange={handleColorChange} />
+        </div>
         <TextField
           id="note-emoji"
           label="Emotki"

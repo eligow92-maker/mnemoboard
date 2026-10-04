@@ -1,3 +1,5 @@
+import { NOTE_COLOR_CLASSES } from "./note-colors";
+import type { NoteColor } from "@/modules/notes/colors";
 import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 
 export interface NoteNodeData extends Record<string, unknown> {
@@ -5,6 +7,7 @@ export interface NoteNodeData extends Record<string, unknown> {
   imageWords: string | null;
   story: string | null;
   emoji: string | null;
+  color: NoteColor;
   // Numer kolejności w łańcuchu; null poza łańcuchem.
   chainPosition: number | null;
   // Nazwa pokoju, do którego karteczka jest przypisana; null poza pokojami.
@@ -22,11 +25,10 @@ const HANDLE_CLASS = "!pointer-events-none !top-1/2 !left-1/2 !h-px !w-px !borde
 export function NoteNode({ data, selected, dragging }: NodeProps<NoteFlowNode>) {
   return (
     <div
+      data-note-color={data.color}
       className={`relative min-h-24 w-[180px] rounded-sm border p-2 text-sm text-text-primary ${
-        selected || data.highlighted
-          ? "border-primary bg-note-selected"
-          : "border-note-border bg-note"
-      } ${data.highlighted ? "ring-2 ring-primary" : ""} ${
+        NOTE_COLOR_CLASSES[data.color]
+      } ${selected || data.highlighted ? "border-primary ring-2 ring-primary" : ""} ${
         dragging ? "shadow-note-drag" : "shadow-note"
       }`}
     >

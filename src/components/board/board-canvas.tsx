@@ -15,6 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, type MouseEvent } from "react";
 import "@xyflow/react/dist/style.css";
 import type { ConnectionKind } from "@/lib/api-types";
+import { DEFAULT_NOTE_COLOR, type NoteColor } from "@/modules/notes/colors";
 import { ConnectionEdge, type ConnectionFlowEdge } from "./connection-edge";
 import type { Position } from "./dimensions";
 import { NoteNode, type NoteFlowNode } from "./note-node";
@@ -26,6 +27,7 @@ export interface CanvasNote {
   imageWords: string | null;
   story?: string | null;
   emoji?: string | null;
+  color?: NoteColor;
   chainPosition?: number | null;
   zoneId?: string | null;
   x: number;
@@ -85,6 +87,7 @@ function toNoteNode(
       imageWords: note.imageWords,
       story: note.story ?? null,
       emoji: note.emoji ?? null,
+      color: note.color ?? DEFAULT_NOTE_COLOR,
       chainPosition: note.chainPosition ?? null,
       zoneName: (note.zoneId && zoneNames.get(note.zoneId)) || null,
       highlighted: note.id === highlightedNoteId,

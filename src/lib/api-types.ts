@@ -1,5 +1,7 @@
 // Kształty odpowiedzi API (.prodready/design/api/openapi.yaml) — daty jako tekst ISO.
 
+import type { NoteColor } from "@/modules/notes/colors";
+
 export interface BoardDto {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ export interface NoteDto {
   imageWords: string | null;
   story: string | null;
   emoji: string | null;
+  color: NoteColor;
   x: number;
   y: number;
   chainPosition: number | null;
@@ -82,6 +85,7 @@ export interface ReviewCardDto {
   imageWords: string;
   story: string | null;
   emoji: string | null;
+  color: NoteColor;
   zoneName: string | null;
 }
 

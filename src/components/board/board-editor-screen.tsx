@@ -9,6 +9,7 @@ import { BoardToolbar, type EditorMode } from "./board-toolbar";
 import { ConnectionPanel } from "./connection-panel";
 import { NOTE_HEIGHT, NOTE_WIDTH, type Position } from "./dimensions";
 import { Toast } from "@/components/ui/toast";
+import { DEFAULT_NOTE_COLOR, type NoteColor } from "@/modules/notes/colors";
 import { NoteEditor, type NoteEditorValues } from "./note-editor";
 import { ZoneEditor } from "./zone-editor";
 import { ZONE_DEFAULT_HEIGHT, ZONE_DEFAULT_WIDTH, type ZoneRect } from "./zone-node";
@@ -217,6 +218,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
       imageWords: values.imageWords || null,
       story: values.story || null,
       emoji: values.emoji || null,
+      color: values.color,
       ...position,
     });
     setBoard((current) => current && { ...current, notes: [...current.notes, note] });
@@ -230,9 +232,14 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         imageWords: values.imageWords || null,
         story: values.story || null,
         emoji: values.emoji || null,
+        color: values.color,
       }),
     );
     setPanel(null);
+  }
+
+  async function changeNoteColor(noteId: string, color: NoteColor): Promise<void> {
+    replaceNote(await api<NoteDto>(`/api/notes/${noteId}`, "PATCH", { color }));
   }
 
   async function deleteNote(noteId: string): Promise<void> {
@@ -314,7 +321,7 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
         {panel?.kind === "new-note" && (
           <NoteEditor
             title="Nowa karteczka"
-            initial={{ topic: "", imageWords: "", story: "", emoji: "" }}
+            initial={{ topic: "", imageWords: "", story: "", emoji: "", color: DEFAULT_NOTE_COLOR }}
             onSave={(values) => createNote(panel.position, values)}
             onCancel={() => setPanel(null)}
           />
@@ -328,10 +335,12 @@ export function BoardEditorScreen({ boardId }: { boardId: string }) {
               imageWords: editedNote.imageWords ?? "",
               story: editedNote.story ?? "",
               emoji: editedNote.emoji ?? "",
+              color: editedNote.color,
             }}
             onSave={(values) => saveNote(editedNote.id, values)}
             onCancel={() => setPanel(null)}
             onDelete={() => deleteNote(editedNote.id)}
+            onColorChange={(color) => changeNoteColor(editedNote.id, color)}
           />
         )}
         {panel?.kind === "new-zone" && (

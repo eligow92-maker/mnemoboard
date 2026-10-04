@@ -1,6 +1,7 @@
 import { Prisma, type ReviewResult, type ReviewSession } from "@prisma/client";
 import { ApiError, notFound } from "@/lib/api";
 import { prisma } from "@/lib/db";
+import type { NoteColor } from "@/modules/notes/colors";
 import { reviewOrder } from "./order";
 import type { ReviewResultInput } from "./schema";
 import { percent } from "./score";
@@ -11,6 +12,7 @@ export interface ReviewCard {
   imageWords: string;
   story: string | null;
   emoji: string | null;
+  color: NoteColor;
   zoneName: string | null;
 }
 
@@ -60,6 +62,7 @@ export async function startSession(boardId: string): Promise<ReviewSessionStart>
         imageWords: note.imageWords ?? "",
         story: note.story,
         emoji: note.emoji,
+        color: note.color,
         zoneName: note.zone?.name ?? null,
       },
     ];

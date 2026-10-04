@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NOTE_COLORS } from "./colors";
 
 export const NOTE_TEXT_MAX_LENGTH = 500;
 export const NOTE_TOPIC_REQUIRED_MESSAGE = "Wpisz zagadnienie";
@@ -50,6 +51,8 @@ const emoji = z
   .transform((value) => (value === "" ? null : value))
   .nullable();
 
+const color = z.enum(NOTE_COLORS, { errorMap: () => ({ message: "Nieznany kolor karteczki" }) });
+
 const coordinate = z.number({ required_error: "Podaj położenie" }).finite();
 
 export const noteCreateSchema = z.object({
@@ -57,6 +60,7 @@ export const noteCreateSchema = z.object({
   imageWords: imageWords.optional(),
   story: story.optional(),
   emoji: emoji.optional(),
+  color: color.optional(),
   x: coordinate,
   y: coordinate,
 });
@@ -69,6 +73,7 @@ export const noteUpdateSchema = z
     imageWords: imageWords.optional(),
     story: story.optional(),
     emoji: emoji.optional(),
+    color: color.optional(),
     x: coordinate.optional(),
     y: coordinate.optional(),
   })

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { NOTE_COLOR_CLASSES } from "@/components/board/note-colors";
 import { Button } from "@/components/ui/button";
 import { api, ApiClientError, errorMessage } from "@/lib/api-client";
 import type { ReviewCardDto, ReviewSessionStartDto, ReviewSummaryDto } from "@/lib/api-types";
@@ -23,7 +24,7 @@ function ReviewCard({ card, revealed }: { card: ReviewCardDto; revealed: boolean
   return (
     <section
       aria-label="Karteczka"
-      className="flex min-h-48 flex-col gap-4 rounded-lg border border-note-border bg-note p-4 shadow-note"
+      className={`flex min-h-48 flex-col gap-4 rounded-lg border p-4 shadow-note ${NOTE_COLOR_CLASSES[card.color]}`}
     >
       <p
         data-testid="review-topic"
