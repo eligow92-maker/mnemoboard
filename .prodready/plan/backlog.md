@@ -813,7 +813,7 @@ AC-4: Given brak własnych wpisów, when generuję słowa dla zagadnienia "333",
 ## Sprint 7: Eksport, import i kopie zapasowe (iteracja 2)
 
 ### TASK-032: Format pliku i walidacja (moduł transfer)
-**Priority**: P0 | **Estimate**: 3h | **Status**: Ready
+**Priority**: P0 | **Estimate**: 3h | **Status**: Done
 
 **Description**:
 Nowy moduł `src/modules/transfer`: schematy Zod `BoardExportFile` i `BackupFile` (format, wersja, rodzaj), serializacja planszy do pliku, walidacja powiązań z użyciem reguł modułu `arrangement` (połączenia tylko między karteczkami z pliku, jedno połączenie na parę, łańcuch bez pętli), nazwa pliku bez polskich znaków. Czyste funkcje, bez bazy.
@@ -825,14 +825,14 @@ AC-3: Given plik z ogniwami łańcucha A→B, B→C i C→A, when go waliduję, 
 AC-4: Given plansza o nazwie "Żółta Historia Polski", when wyznaczam nazwę pliku eksportu, then nazwa zawiera "zolta-historia-polski".
 
 **TDD Tasks**:
-- [ ] Write failing canonical test for AC-1
-- [ ] Implement AC-1 (red→green)
-- [ ] Write failing canonical test for AC-2
-- [ ] Implement AC-2 (red→green)
-- [ ] Write failing canonical test for AC-3
-- [ ] Implement AC-3 (red→green)
-- [ ] Write failing canonical test for AC-4
-- [ ] Implement AC-4 (red→green)
+- [x] Write failing canonical test for AC-1
+- [x] Implement AC-1 (red→green)
+- [x] Write failing canonical test for AC-2
+- [x] Implement AC-2 (red→green)
+- [x] Write failing canonical test for AC-3
+- [x] Implement AC-3 (red→green)
+- [x] Write failing canonical test for AC-4
+- [x] Implement AC-4 (red→green)
 
 **Blocked by**: TASK-025, TASK-026, TASK-027
 **Blocks**: TASK-033
